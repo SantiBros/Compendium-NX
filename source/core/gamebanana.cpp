@@ -143,16 +143,16 @@ std::vector<Category> parseCategories(const std::string& body) {
     return out;
 }
 
-std::string Client::listUrl(Game game, Sort sort, int page, int perPage, int64_t categoryId) {
+std::string Client::listUrl(int64_t gbGameId, Sort sort, int page, int perPage, int64_t categoryId) {
     auto url = std::string(kApi) + "/Mod/Index?_nPage=" + std::to_string(page) + "&_nPerpage=" + std::to_string(perPage) +
-               "&_aFilters%5BGeneric_Game%5D=" + std::to_string(gameInfo(game).gamebananaId) + "&_sSort=" + sortParam(sort);
+               "&_aFilters%5BGeneric_Game%5D=" + std::to_string(gbGameId) + "&_sSort=" + sortParam(sort);
     if (categoryId) url += "&_aFilters%5BGeneric_Category%5D=" + std::to_string(categoryId);
     return url;
 }
 
-std::string Client::searchUrl(Game game, const std::string& query, int page) {
+std::string Client::searchUrl(int64_t gbGameId, const std::string& query, int page) {
     return std::string(kApi) + "/Util/Search/Results?_sModelName=Mod&_sSearchString=" + urlEncode(query) +
-           "&_idGameRow=" + std::to_string(gameInfo(game).gamebananaId) + "&_nPage=" + std::to_string(page);
+           "&_idGameRow=" + std::to_string(gbGameId) + "&_nPage=" + std::to_string(page);
 }
 
 std::string Client::detailsUrl(int64_t modId) {
@@ -161,14 +161,14 @@ std::string Client::detailsUrl(int64_t modId) {
     return std::string(kApi) + "/Mod/" + std::to_string(modId) + "/ProfilePage";
 }
 
-Page Client::list(Game game, Sort sort, int page, int perPage, int64_t categoryId) {
-    return parseModList(http_.get(listUrl(game, sort, page, perPage, categoryId)));
+Page Client::list(int64_t gbGameId, Sort sort, int page, int perPage, int64_t categoryId) {
+    return parseModList(http_.get(listUrl(gbGameId, sort, page, perPage, categoryId)));
 }
 
-Page Client::search(Game game, const std::string& query, int page) {
-    auto p = parseModList(http_.get(searchUrl(game, query, page)));
+Page Client::search(int64_t gbGameId, const std::string& query, int page) {
+    auto p = parseModList(http_.get(searchUrl(gbGameId, query, page)));
     // Belt and braces: never show another game's mods even if _idGameRow is ignored.
-    auto want = gameInfo(game).gamebananaId;
+    auto want = gbGameId;
     std::erase_if(p.mods, [&](const ModSummary& m) { return m.gameId && m.gameId != want; });
     return p;
 }
@@ -179,9 +179,9 @@ std::vector<ModFile> Client::files(int64_t modId) {
     return parseFiles(http_.get(std::string(kApi) + "/Mod/" + std::to_string(modId) + "/Files"));
 }
 
-std::vector<Category> Client::categories(Game game) {
-    return parseCategories(http_.get(std::string(kApi) + "/Mod/Categories?_idGameRow=" +
-                                     std::to_string(gameInfo(game).gamebananaId) + "&_sSort=a_to_z&_bShowEmpty=false"));
+std::vector<Category> Client::categories(int64_t gbGameId) {
+    return parseCategories(http_.get(std::string(kApi) + "/Mod/Categories?_idGameRow=" + std::to_string(gbGameId) +
+                                     "&_sSort=a_to_z&_bShowEmpty=false"));
 }
 
 }  // namespace mm::gb

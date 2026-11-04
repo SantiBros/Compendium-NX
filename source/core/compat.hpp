@@ -43,7 +43,7 @@ size_t closestVersionOption(const std::vector<std::string>& options, Game game, 
 bool isAddOnFileOf(const std::string& own, const std::string& other);
 
 // True for downloads that put the game's original files back ("uninstall_helm_pack.rar",
-// "vanilla_files.zip"), meant for undoing a hand-copied install. Patchwork undoes mods itself.
+// "vanilla_files.zip"), meant for undoing a hand-copied install. The manager undoes mods itself.
 bool isRestoreOriginalsFile(const std::string& filename, const std::string& description = "");
 
 // How well a file's label suits the console's language (its two-letter code, "en", "de"…):

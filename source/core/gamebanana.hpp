@@ -75,8 +75,9 @@ class Client {
 public:
     explicit Client(HttpClient& http) : http_(http) {}
 
-    Page list(Game game, Sort sort, int page, int perPage = 20, int64_t categoryId = 0);
-    Page search(Game game, const std::string& query, int page);  // GameBanana returns 15 per page
+    // `gbGameId`: one of GameBanana's game pages (a game's Switch or PC page).
+    Page list(int64_t gbGameId, Sort sort, int page, int perPage = 20, int64_t categoryId = 0);
+    Page search(int64_t gbGameId, const std::string& query, int page);  // GameBanana returns 15 per page
     ModDetails details(int64_t modId);
     // Just a mod's current files (a small request, for filtering lists).
     std::vector<ModFile> files(int64_t modId);

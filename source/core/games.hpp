@@ -18,6 +18,7 @@ struct GameInfo {
     std::string_view displayName;
     std::string_view titleId;      // upper-case hex, as Atmosphère expects
     int gamebananaId;              // the game's Switch page on GameBanana
+    int gamebananaPcId;            // its PC page (those mods are adapted when installed)
     // Where mods' CPK contents go when the manager builds the game's patch archive
     // (LayeredFS mode), relative to the game's romfs.
     std::string_view patchCpk;
@@ -26,7 +27,7 @@ struct GameInfo {
 };
 
 inline constexpr std::array<GameInfo, 1> kGames = {{
-    {Game::P5R, "p5r", "Persona 5 Royal", "01005CA01580E000", 17354, "CPK/PATCH1.CPK", 0},
+    {Game::P5R, "p5r", "Persona 5 Royal", "01005CA01580E000", 17354, 16951, "CPK/PATCH1.CPK", 0},
 }};
 
 // Persona games on Switch that aren't supported yet (shown as "coming later").

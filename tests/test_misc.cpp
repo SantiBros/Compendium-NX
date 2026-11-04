@@ -54,7 +54,7 @@ TEST("SimpleModManager mods are found on the SD card") {
 }
 
 TEST("GameBanana: P5R (Switch) list URL and saved responses parse") {
-    auto url = gb::Client::listUrl(Game::P5R, gb::Sort::Newest, 1, 20, 0);
+    auto url = gb::Client::listUrl(gameInfo(Game::P5R).gamebananaId, gb::Sort::Newest, 1, 20, 0);
     CHECK(url.find("Generic_Game%5D=17354") != std::string::npos);
     auto page = gb::parseModList(th::read(fs::path(MM_FIXTURES) / "gb_list.json"));
     CHECK(!page.mods.empty());
