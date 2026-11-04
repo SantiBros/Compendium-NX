@@ -448,7 +448,7 @@ void InstallFlow::showVariantPicker(const ModDetails& d, const ModFile& file, st
         row->addView(text);
         size_t count = v.files.size() + v.sdFiles.size();
         for (const auto& c : v.cpks) count += c.files;
-        row->addView(ui::label(std::to_string(count) + " files", 15, ui::muted()));
+        row->addView(ui::label(std::to_string(count) + (count == 1 ? " file" : " files"), 15, ui::muted()));
         row->registerClickAction([selected, boxes, i](brls::View*) {
             (*selected)[i] = !(*selected)[i];
             (*boxes)[i]->setText((*selected)[i] ? ui::icon::boxOn : ui::icon::boxOff);
@@ -547,7 +547,7 @@ void InstallFlow::finish(const ModDetails& d, const ModFile& file, std::shared_p
                 if (m)
                     for (const auto& n : m->notes) body += "\n\n" + std::string(ui::icon::info) + " " + n;
                 if (build.missingOriginals)
-                    body += "\n\nTip: let the app read the game's own PATCH1.CPK once (Settings → Game files), so its files are "
+                    body += "\n\nTip: let the app read the game's own PATCH1.CPK once (Settings → The game's own files), so its files are "
                             "kept in the one built for your mods.";
                 body += "\n\nYou can turn it off or change its load order in My mods.";
                 showMessage("Installed", body, false);

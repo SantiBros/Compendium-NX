@@ -178,6 +178,16 @@ void startScriptFromEnv() {
 
 void afterFrame() {
     if (pendingShot.empty()) return;
+    const char* dir = std::getenv("MM_SHOT_DIR");
+    auto path = std::string(dir ? dir : ".") + "/" + pendingShot + ".png";
+    // Some virtual displays (Xvfb with software GL) give back a black front buffer: there,
+    // $MM_SHOT_CMD takes the picture from outside ("import -window root", given the path).
+    if (const char* cmd = std::getenv("MM_SHOT_CMD")) {
+        if (std::system((std::string(cmd) + " '" + path + "'").c_str()) != 0) brls::Logger::warning("screenshot failed");
+        pendingShot.clear();
+        runNext();
+        return;
+    }
     // The frame was just presented; read it back from the front buffer.
     int w = 0, h = 0;
     GLint vp[4];
@@ -188,8 +198,7 @@ void afterFrame() {
     glReadBuffer(GL_FRONT);
     glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
     glReadBuffer(GL_BACK);
-    const char* dir = std::getenv("MM_SHOT_DIR");
-    writePng(std::string(dir ? dir : ".") + "/" + pendingShot + ".png", w, h, rgba);
+    writePng(path, w, h, rgba);
     pendingShot.clear();
     runNext();
 }
