@@ -81,10 +81,10 @@ public:
     ModDetails details(int64_t modId);
     // Just a mod's current files (a small request, for filtering lists).
     std::vector<ModFile> files(int64_t modId);
-    std::vector<Category> categories(Game game);
+    std::vector<Category> categories(int64_t gbGameId);
 
-    static std::string listUrl(Game game, Sort sort, int page, int perPage, int64_t categoryId);
-    static std::string searchUrl(Game game, const std::string& query, int page);
+    static std::string listUrl(int64_t gbGameId, Sort sort, int page, int perPage, int64_t categoryId);
+    static std::string searchUrl(int64_t gbGameId, const std::string& query, int page);
     static std::string detailsUrl(int64_t modId);
 
 private:
