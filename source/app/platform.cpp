@@ -80,9 +80,9 @@ mm::fs::path resourcePath(const std::string& name) {
 
 std::string userAgent() {
 #ifdef __SWITCH__
-    return "Mozilla/5.0 (Nintendo Switch; PersonaModManager/" APP_VERSION ")";
+    return "Mozilla/5.0 (Nintendo Switch; Compendium/" APP_VERSION ")";
 #else
-    return "Mozilla/5.0 (compatible; PersonaModManager/" APP_VERSION ")";
+    return "Mozilla/5.0 (compatible; Compendium/" APP_VERSION ")";
 #endif
 }
 

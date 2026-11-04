@@ -1,11 +1,11 @@
-// pmmcli: the manager's core on a computer, for testing mods and archives.
+// compcli: the manager's core on a computer, for testing mods and archives.
 //
-//   pmmcli list <file.cpk>                 files in a CPK
-//   pmmcli extract <file.cpk> <folder>     unpack a CPK
-//   pmmcli pack <folder> <out.cpk>         pack a folder (its paths become the CPK's)
-//   pmmcli detect <archive|folder>         what a mod archive holds and where it would go
-//   pmmcli install <sd root> <archive>     install into a fake SD card (all options, on)
-//   pmmcli status <sd root>                the mods installed there and the built archive
+//   compcli list <file.cpk>                 files in a CPK
+//   compcli extract <file.cpk> <folder>     unpack a CPK
+//   compcli pack <folder> <out.cpk>         pack a folder (its paths become the CPK's)
+//   compcli detect <archive|folder>         what a mod archive holds and where it would go
+//   compcli install <sd root> <archive>     install into a fake SD card (all options, on)
+//   compcli status <sd root>                the mods installed there and the built archive
 
 #include <iostream>
 
@@ -16,7 +16,7 @@
 using namespace mm;
 
 static int usage() {
-    std::cerr << "usage: pmmcli list|extract|pack|detect|install|status …\n";
+    std::cerr << "usage: compcli list|extract|pack|detect|install|status …\n";
     return 2;
 }
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
             auto r = cpk::build(argv[3], src);
             std::cout << r.files << " files, " << formatSize(r.bytes) << "\n";
         } else if (cmd == "detect") {
-            auto work = fs::temp_directory_path() / "pmmcli-detect";
+            auto work = fs::temp_directory_path() / "compcli-detect";
             auto prep = prepareArchive(argv[2], work, Game::P5R);
             const auto& l = prep.layout;
             if (!l.problem.empty()) std::cout << "can't install: " << l.problem << "\n";
@@ -58,9 +58,9 @@ int main(int argc, char** argv) {
             removeTree(work);
         } else if (cmd == "install" && argc >= 4) {
             fs::path sd = argv[2];
-            Library lib(sd, sd / "switch/PersonaModManager");
+            Library lib(sd, sd / "switch/Compendium");
             lib.load();
-            auto work = sd / "switch/PersonaModManager/work/cli";
+            auto work = sd / "switch/Compendium/work/cli";
             auto prep = prepareArchive(argv[3], work, Game::P5R);
             if (prep.layout.variants.empty()) throw std::runtime_error(prep.layout.problem);
             std::vector<size_t> all;
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
             std::cout << "installed " << rec.id << "\n";
         } else if (cmd == "status") {
             fs::path sd = argv[2];
-            Library lib(sd, sd / "switch/PersonaModManager");
+            Library lib(sd, sd / "switch/Compendium");
             lib.load();
             for (const auto* m : lib.mods(Game::P5R))
                 std::cout << (m->enabled ? "[on]  " : "[off] ") << m->priority << "  " << m->name << "  (" << m->cpkFiles.size()

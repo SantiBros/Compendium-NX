@@ -31,7 +31,7 @@ namespace {
 constexpr size_t kMaxRequest = 8192;
 
 const char* kPage = R"HTML(<!doctype html><html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>Persona Mod Manager</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Compendium</title>
 <style>body{font-family:system-ui,sans-serif;background:#f5f5f5;color:#1e1e1e;margin:0;padding:24px;max-width:480px}
 h1{font-size:20px;margin:0 0 4px}p{color:#555;font-size:14px}
 input{width:100%;box-sizing:border-box;font-size:16px;padding:12px;border:1px solid #bbb;border-radius:8px}
@@ -39,7 +39,7 @@ button{width:100%;margin-top:12px;font-size:16px;padding:12px;border:0;border-ra
 .ok{background:#e1f5ee;color:#085041;padding:10px;border-radius:8px;font-size:14px;margin-top:16px;word-break:break-all}
 .err{background:#fcebeb;color:#791f1f;padding:10px;border-radius:8px;font-size:14px;margin-top:16px}
 ul{color:#666;font-size:13px;padding-left:18px}</style></head><body>
-<h1>Persona Mod Manager</h1><p>Send a mod to your Switch</p>
+<h1>Compendium</h1><p>Send a mod to your Switch</p>
 <form method="post" action="send"><input name="url" type="url" placeholder="Paste a link…" required autofocus>
 <button type="submit">Send to Switch</button></form>%STATUS%
 <ul><li>GameBanana mod pages (Switch or PC)</li><li>GitHub projects (their latest release)</li><li>Direct links to .zip, .7z, .rar or .cpk files</li></ul>

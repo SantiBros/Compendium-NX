@@ -1,14 +1,14 @@
-Persona Mod Manager — third-party notices
+Compendium — third-party notices
 
-Persona Mod Manager (by SantiBros) is free software under the GNU General Public License v3.0
-(see LICENSE in the source repository: https://github.com/SantiBros/PersonaModManager-NX).
+Compendium (by SantiBros) is free software under the GNU General Public License v3.0
+(see LICENSE in the source repository: https://github.com/SantiBros/Compendium-NX).
 
 ==============================================================================
 Patchwork
 https://github.com/TheRomeoAlfa/patchwork-nx
 License: GNU General Public License v3.0
 ------------------------------------------------------------------------------
-Persona Mod Manager is based on Patchwork, a Switch mod manager for Zelda games by
+Compendium is based on Patchwork, a Switch mod manager for Zelda games by
 TheRomeoAlfa: its GameBanana client, downloader, archive unpacking, app structure and
 user interface code were adapted from it.
 
@@ -17,7 +17,7 @@ SimpleModManager
 https://github.com/nadrino/SimpleModManager
 License: GNU General Public License v3.0
 ------------------------------------------------------------------------------
-Persona Mod Manager reads mods kept in SimpleModManager's folder layout
+Compendium reads mods kept in SimpleModManager's folder layout
 (sd:/mods/<game>/<mod>/) and follows its idea of keeping every mod apart and copying the
 enabled ones into Atmosphère's folders.
 

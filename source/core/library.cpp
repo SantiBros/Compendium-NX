@@ -213,7 +213,7 @@ bool Library::hasOriginalPatch(Game game) const {
 }
 
 std::string Library::outputTarget(Game game, DeployMode mode) {
-    if (mode == DeployMode::P5rcbt) return "p5r/bind/PersonaModManager.cpk";
+    if (mode == DeployMode::P5rcbt) return "p5r/bind/Compendium.cpk";
     return contentsDir(game) + "/romfs/" + std::string(gameInfo(game).patchCpk);
 }
 

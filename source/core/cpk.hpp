@@ -69,7 +69,7 @@ struct Source {
 
 struct BuildOptions {
     uint16_t align = 0x800;
-    std::string tool = "PersonaModManager";
+    std::string tool = "Compendium";
 };
 
 struct BuildResult {

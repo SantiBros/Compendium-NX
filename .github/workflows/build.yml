@@ -19,7 +19,7 @@ jobs:
         run: |
           cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build build
-          ./build/pmmtests
+          ./build/comptests
 
   switch:
     name: Switch (.nro)
@@ -37,14 +37,14 @@ jobs:
         run: |
           export DEVKITPRO=/opt/devkitpro
           cmake -S . -B build-switch -DPLATFORM_SWITCH=ON -DCMAKE_BUILD_TYPE=Release
-          cmake --build build-switch --target PersonaModManager.nro -j"$(nproc)"
+          cmake --build build-switch --target Compendium.nro -j"$(nproc)"
       - uses: actions/upload-artifact@v4
         with:
-          name: PersonaModManager
-          path: build-switch/PersonaModManager.nro
+          name: Compendium
+          path: build-switch/Compendium.nro
       - name: Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: build-switch/PersonaModManager.nro
+          files: build-switch/Compendium.nro
           draft: true

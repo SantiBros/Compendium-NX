@@ -68,7 +68,7 @@ SettingsPage::SettingsPage() : brls::Box(brls::Axis::COLUMN) {
         auto current = modes.count(game) ? modes.at(game) : mm::DeployMode::Patch1;
         auto next = current == mm::DeployMode::Patch1 ? mm::DeployMode::P5rcbt : mm::DeployMode::Patch1;
         std::string text = next == mm::DeployMode::P5rcbt
-                               ? "Load mods with p5rcbt? Your mods are packed into p5r/bind/PersonaModManager.cpk, which the p5rcbt "
+                               ? "Load mods with p5rcbt? Your mods are packed into p5r/bind/Compendium.cpk, which the p5rcbt "
                                  "plugin adds to the game's files, and the game's own PATCH1.CPK stays as it is.\n\n"
                                  "p5rcbt (a Skyline plugin) has to be installed (below) and only works with game version " +
                                      std::string(mm::p5rcbt::kRequiredGameVersion) + "."
@@ -256,7 +256,7 @@ SettingsPage::SettingsPage() : brls::Box(brls::Axis::COLUMN) {
 
     auto* where = new brls::DetailCell();
     where->setText("Mod library folder");
-    where->setDetailText("SD:/switch/PersonaModManager");
+    where->setDetailText("SD:/switch/Compendium");
     content->addView(where);
 
     section("About");
@@ -268,7 +268,7 @@ SettingsPage::SettingsPage() : brls::Box(brls::Axis::COLUMN) {
         "turns them off for that launch.\n"
         "Based on Patchwork by TheRomeoAlfa and SimpleModManager by nadrino. p5rcbt is by Raytwo. CPK and mod formats as "
         "documented by ShrineFox, Aemulus and the CriPakTools/PyCriCodecs projects.\n"
-        "Free software under the GNU GPL v3. Source code and third-party licenses: github.com/SantiBros/PersonaModManager-NX",
+        "Free software under the GNU GPL v3. Source code and third-party licenses: github.com/SantiBros/Compendium-NX",
         16, ui::muted(), false);
     about->setMargins(4, 4, 0, 4);
     content->addView(about);

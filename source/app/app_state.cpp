@@ -78,7 +78,7 @@ AppState::AppState() = default;
 
 
 void AppState::init() {
-    dataDir_ = platform::sdRoot() / "switch" / "PersonaModManager";
+    dataDir_ = platform::sdRoot() / "switch" / "Compendium";
     mm::fs::create_directories(dataDir_);
     std::error_code ec;
     mm::fs::create_directories(inboxDir(), ec);
@@ -134,7 +134,7 @@ void AppState::captureGameFiles(mm::Library& lib) {
         platform::copyGameFile(game, std::string(mm::gameInfo(game).patchCpk), tmp);
         // Opened without L, Atmosphère hands over the SD card's PATCH1.CPK: the one we built.
         auto info = mm::cpk::read(tmp);
-        if (info.tool == "PersonaModManager") {
+        if (info.tool == "Compendium") {
             std::error_code ec;
             mm::fs::remove(tmp, ec);
             status = "Mods were on when the game started. Hold L as well as R next time.";
@@ -185,7 +185,7 @@ std::string AppState::gameFilesSteps() {
     return "1. Press + to close the app.\n"
            "2. Hold L and R and start Persona 5 Royal. Keep holding until the Homebrew Menu opens.\n"
            "   (R opens the Homebrew Menu in place of the game; L turns mods off for that launch.)\n"
-           "3. Open Persona Mod Manager from the Homebrew Menu. It reads the files by itself.";
+           "3. Open Compendium from the Homebrew Menu. It reads the files by itself.";
 }
 
 void AppState::shutdown() {
@@ -220,7 +220,7 @@ void AppState::saveSettings() {
 int AppState::networkThreads() { return platform::fullMemory() ? 3 : 2; }
 
 std::string AppState::outOfMemoryMessage() {
-    std::string text = "Persona Mod Manager ran out of memory.";
+    std::string text = "Compendium ran out of memory.";
     if (!platform::fullMemory())
         text += "\n\nIt was opened from the Album, which leaves it only a little memory. Press + to close it, then "
                 "hold R while starting a game and open it from the Homebrew Menu that appears.";

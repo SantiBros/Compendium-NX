@@ -3,15 +3,17 @@
 [![English](https://img.shields.io/badge/lang-English-d62027?style=for-the-badge)](README.md)
 [![Español](https://img.shields.io/badge/idioma-Espa%C3%B1ol-121212?style=for-the-badge)](README.es.md)
 
-<img src="resources/img/icon.jpg" width="128" alt="Icono de Persona Mod Manager">
+<img src="resources/img/icon.jpg" width="128" alt="Icono de Compendium">
 
-# Persona Mod Manager
+# Compendium
+
+*Un gestor de mods para juegos Persona en Switch, con el nombre del Compendio, donde los juegos guardan tus Personas para volver a invocarlas.*
 
 **Instala y gestiona mods de juegos Persona en una Nintendo Switch con firmware personalizado, desde la propia consola. Sin PC.**<br>
 Explora GameBanana, descarga un mod y la app lo integra en los archivos del juego: arma en la propia Switch el
 archivo `.CPK` que lee Persona 5 Royal.
 
-[![Última versión](https://img.shields.io/github/v/release/SantiBros/PersonaModManager-NX?include_prereleases&style=for-the-badge&label=descargar&color=d62027&logo=github&logoColor=white)](../../releases)
+[![Última versión](https://img.shields.io/github/v/release/SantiBros/Compendium-NX?include_prereleases&style=for-the-badge&label=descargar&color=d62027&logo=github&logoColor=white)](../../releases)
 ![Estado: primera versión](https://img.shields.io/badge/estado-primera%20versi%C3%B3n-fac775?style=for-the-badge)
 ![Homebrew de Nintendo Switch](https://img.shields.io/badge/Nintendo%20Switch-homebrew-121212?style=for-the-badge)
 ![Atmosphère](https://img.shields.io/badge/CFW-Atmosph%C3%A8re-121212?style=for-the-badge)
@@ -47,16 +49,16 @@ archivo `.CPK` que lee Persona 5 Royal.
 - **Mods de PC adaptados:** los mods de Reloaded-II para la versión de PC (P5R Essentials) se convierten para Switch al instalarlos.
 - **Orden de carga y conflictos:** cuando dos mods cambian el mismo archivo, gana el que está más arriba en Mis mods, y la app te dice qué archivos chocan.
 - **Encender y apagar sin borrar:** se guarda una copia de cada mod, así que al apagar uno se vuelven a armar los archivos del juego sin él.
-- **Agrega mods desde cualquier lado:** GameBanana (explorando o escribiendo el número del mod), proyectos de GitHub (su última versión), un enlace enviado desde tu celular (escaneando un código QR) o archivos copiados a `switch/PersonaModManager/inbox`.
+- **Agrega mods desde cualquier lado:** GameBanana (explorando o escribiendo el número del mod), proyectos de GitHub (su última versión), un enlace enviado desde tu celular (escaneando un código QR) o archivos copiados a `switch/Compendium/inbox`.
 - **Trae tus mods de antes:** los mods guardados para **SimpleModManager** (`sd:/mods/…`) y un `PATCH1.CPK` copiado a mano se pueden agregar a la lista.
 - **Compatible con p5rcbt:** instala el plugin de Skyline p5rcbt desde Ajustes y cambia sus opciones (60 FPS, el menú de ajustes de la versión de PC).
 - **Cuida tus archivos:** lo que ya hubiera en la SD donde escribe la app se aparta y vuelve a su lugar cuando apagas tus mods.
 
 ## Cómo instalar
 
-1. Descarga **`PersonaModManager.nro`** de la [página de versiones](../../releases) (no "Source code").
-2. Cópialo a `sd:/switch/PersonaModManager/PersonaModManager.nro`.
-3. Abre el Homebrew Menu e inicia **Persona Mod Manager**. Para tener toda la memoria, abre el Homebrew Menu manteniendo **R** al iniciar un juego, en vez de desde el Álbum.
+1. Descarga **`Compendium.nro`** de la [página de versiones](../../releases) (no "Source code").
+2. Cópialo a `sd:/switch/Compendium/Compendium.nro`.
+3. Abre el Homebrew Menu e inicia **Compendium**. Para tener toda la memoria, abre el Homebrew Menu manteniendo **R** al iniciar un juego, en vez de desde el Álbum.
 
 Para actualizar, reemplaza el `.nro`. Tus mods y ajustes se conservan.
 
@@ -68,7 +70,7 @@ al armar el de tus mods, deja que los lea una vez (y de nuevo después de actual
 1. Presiona **+** para cerrar la app.
 2. Mantén **L y R** e inicia Persona 5 Royal. Sigue manteniéndolos hasta que se abra el Homebrew Menu.
    (R abre el Homebrew Menu en lugar del juego; L apaga los mods en ese inicio.)
-3. Abre Persona Mod Manager. Lee los archivos sola y te avisa cuando termina.
+3. Abre Compendium. Lee los archivos sola y te avisa cuando termina.
 
 También lee la lista de archivos del juego, que usa para ubicar los archivos de mods que no traen su carpeta del CPK.
 
@@ -81,7 +83,7 @@ La app está en inglés por ahora; entre paréntesis va la traducción.
 |---|---|
 | **Browse** (Explorar) | Los mods de Persona 5 Royal en GameBanana. **L/R**: mods de Switch o de PC · **Y**: cambiar el orden · **X**: buscar · **A**: instalar |
 | **Search** (Buscar) | Busca por nombre o autor, o escribe el número de un mod (el final de su enlace de GameBanana) |
-| **Add mods** (Agregar mods) | Archivos en `switch/PersonaModManager/inbox`, mods de SimpleModManager, un `PATCH1.CPK` copiado a mano, un enlace desde tu celular o un número de mod |
+| **Add mods** (Agregar mods) | Archivos en `switch/Compendium/inbox`, mods de SimpleModManager, un `PATCH1.CPK` copiado a mano, un enlace desde tu celular o un número de mod |
 | **My mods** (Mis mods) | Tu orden de carga (gana el de arriba). **A**: encender/apagar · **L/R**: subir/bajar · **X**: quitar |
 | **Settings** (Ajustes) | Cómo se cargan los mods, los archivos propios del juego, p5rcbt, complementos en segundo plano, almacenamiento |
 
@@ -106,7 +108,7 @@ Elige en **Settings → Load mods with** (Ajustes → Cargar mods con):
 
 - **PATCH1.CPK (sin plugin)**, la opción por defecto. La app arma `atmosphere/contents/01005CA01580E000/romfs/CPK/PATCH1.CPK`
   con tus mods y los archivos propios del PATCH1 del juego, y el LayeredFS de Atmosphère lo carga. Funciona con cualquier versión del juego.
-- **p5rcbt (plugin de Skyline).** La app arma `p5r/bind/PersonaModManager.cpk`, que [p5rcbt](https://github.com/Raytwo/p5rcbt)
+- **p5rcbt (plugin de Skyline).** La app arma `p5r/bind/Compendium.cpk`, que [p5rcbt](https://github.com/Raytwo/p5rcbt)
   agrega a los archivos del juego. El PATCH1.CPK del juego queda intacto. p5rcbt solo funciona con la versión **1.0.2**
   del juego; instálalo desde Ajustes.
 
@@ -114,12 +116,12 @@ Elige en **Settings → Load mods with** (Ajustes → Cargar mods con):
 
 | Ruta | Qué es |
 |---|---|
-| `switch/PersonaModManager/PersonaModManager.nro` | la app |
-| `switch/PersonaModManager/library/` | una copia de cada mod instalado |
-| `switch/PersonaModManager/inbox/` | pon archivos aquí para instalarlos desde Agregar mods |
-| `switch/PersonaModManager/original/` | el PATCH1.CPK propio del juego y su lista de archivos |
-| `switch/PersonaModManager/backup/` | tus propios archivos que la app apartó (vuelven cuando los mods están apagados) |
-| `switch/PersonaModManager/state.json` | qué está instalado y armado |
+| `switch/Compendium/Compendium.nro` | la app |
+| `switch/Compendium/library/` | una copia de cada mod instalado |
+| `switch/Compendium/inbox/` | pon archivos aquí para instalarlos desde Agregar mods |
+| `switch/Compendium/original/` | el PATCH1.CPK propio del juego y su lista de archivos |
+| `switch/Compendium/backup/` | tus propios archivos que la app apartó (vuelven cuando los mods están apagados) |
+| `switch/Compendium/state.json` | qué está instalado y armado |
 
 ## Solución de problemas
 
@@ -135,15 +137,15 @@ Elige en **Settings → Load mods with** (Ajustes → Cargar mods con):
 Para Switch: [devkitPro](https://devkitpro.org/wiki/Getting_Started) con `switch-dev` y `switch-portlibs`.
 
 ```bash
-git clone --recursive https://github.com/SantiBros/PersonaModManager-NX
-cd PersonaModManager-NX
+git clone --recursive https://github.com/SantiBros/Compendium-NX
+cd Compendium-NX
 export DEVKITPRO=/opt/devkitpro
 cmake -S . -B build-switch -DPLATFORM_SWITCH=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build build-switch --target PersonaModManager.nro
+cmake --build build-switch --target Compendium.nro
 ```
 
-El núcleo y las pruebas en un computador (necesita CMake, libarchive y curl): `cmake -S . -B build && cmake --build build && ./build/pmmtests`.
-`build/pmmcli` lista, extrae y empaqueta CPKs, y muestra cómo se instalaría el archivo de un mod.
+El núcleo y las pruebas en un computador (necesita CMake, libarchive y curl): `cmake -S . -B build && cmake --build build && ./build/comptests`.
+`build/compcli` lista, extrae y empaqueta CPKs, y muestra cómo se instalaría el archivo de un mod.
 
 ## Créditos
 

@@ -12,7 +12,7 @@ const std::string kPatch = "atmosphere/contents/01005CA01580E000/romfs/CPK/PATCH
 struct Env {
     t::TempDir tmp;
     fs::path sd = tmp.path / "sd";
-    fs::path data = tmp.path / "sd/switch/PersonaModManager";
+    fs::path data = tmp.path / "sd/switch/Compendium";
     fs::path src = tmp.path / "src";
     Library lib{sd, data};
     int n = 0;

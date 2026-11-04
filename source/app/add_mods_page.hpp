@@ -14,7 +14,7 @@ namespace app {
 
 class InstallFlow;
 
-// "Add mods": install archives copied to the SD card (switch/PersonaModManager/inbox), mods
+// "Add mods": install archives copied to the SD card (switch/Compendium/inbox), mods
 // set up for SimpleModManager, a PATCH1.CPK copied by hand, or a link sent from a phone.
 class AddModsPage : public brls::Box {
 public:

@@ -1,17 +1,17 @@
-# Persona Mod Manager: install and manage Persona mods on a modded Switch.
+# Compendium: install and manage Persona mods on a modded Switch.
 #
 # Three ways to build:
 #
-#   Core + unit tests + pmmcli dev tool (host):
-#     cmake -S . -B build && cmake --build build && ./build/pmmtests
+#   Core + unit tests + compcli dev tool (host):
+#     cmake -S . -B build && cmake --build build && ./build/comptests
 #
 #   The app on Linux/macOS (for UI development, with a fake SD card):
 #     cmake -S . -B build-desktop -DPLATFORM_DESKTOP=ON && cmake --build build-desktop
-#     MM_SD_ROOT=/tmp/fake-sd ./build-desktop/PersonaModManager
+#     MM_SD_ROOT=/tmp/fake-sd ./build-desktop/Compendium
 #
 #   The app for Switch (.nro), with devkitPro:
 #     DEVKITPRO=/opt/devkitpro cmake -S . -B build-switch -DPLATFORM_SWITCH=ON
-#     cmake --build build-switch --target PersonaModManager.nro
+#     cmake --build build-switch --target Compendium.nro
 cmake_minimum_required(VERSION 3.15)
 
 set(APP_BUILD OFF)
@@ -27,8 +27,8 @@ if(PLATFORM_DESKTOP OR PLATFORM_SWITCH)
 endif()
 
 file(STRINGS VERSION PMM_VERSION LIMIT_COUNT 1)
-project(PersonaModManager VERSION ${PMM_VERSION} LANGUAGES C CXX)
-set(APP_TITLE "Persona Mod Manager")
+project(Compendium VERSION ${PMM_VERSION} LANGUAGES C CXX)
+set(APP_TITLE "Compendium")
 set(APP_AUTHOR "SantiBros")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -56,14 +56,14 @@ endif()
 # ---------------------------------------------------------------- host tools
 if(NOT APP_BUILD)
     file(GLOB TEST_SOURCES tests/*.cpp)
-    add_executable(pmmtests ${TEST_SOURCES})
-    target_link_libraries(pmmtests PRIVATE mmcore)
-    target_compile_definitions(pmmtests PRIVATE MM_FIXTURES="${CMAKE_SOURCE_DIR}/tests/fixtures")
+    add_executable(comptests ${TEST_SOURCES})
+    target_link_libraries(comptests PRIVATE mmcore)
+    target_compile_definitions(comptests PRIVATE MM_FIXTURES="${CMAKE_SOURCE_DIR}/tests/fixtures")
     enable_testing()
-    add_test(NAME pmmtests COMMAND pmmtests)
+    add_test(NAME comptests COMMAND comptests)
 
-    add_executable(pmmcli tools/pmmcli.cpp)
-    target_link_libraries(pmmcli PRIVATE mmcore)
+    add_executable(compcli tools/compcli.cpp)
+    target_link_libraries(compcli PRIVATE mmcore)
     return()
 endif()
 
@@ -100,18 +100,18 @@ if(PLATFORM_SWITCH)
     list(APPEND APP_PLATFORM_LIB webp glfw3 EGL glapi drm_nouveau nx m)
 endif()
 
-program_target(PersonaModManager "${APP_SOURCES}")
-add_dependencies(PersonaModManager app_resources)
-target_include_directories(PersonaModManager PRIVATE source/app)
-target_compile_options(PersonaModManager PRIVATE -ffunction-sections -fdata-sections -Wall)
-target_compile_definitions(PersonaModManager PRIVATE APP_VERSION="${PROJECT_VERSION}" APP_TITLE="${APP_TITLE}")
-target_link_libraries(PersonaModManager PRIVATE mmcore borealis ${APP_PLATFORM_LIB})
+program_target(Compendium "${APP_SOURCES}")
+add_dependencies(Compendium app_resources)
+target_include_directories(Compendium PRIVATE source/app)
+target_compile_options(Compendium PRIVATE -ffunction-sections -fdata-sections -Wall)
+target_compile_definitions(Compendium PRIVATE APP_VERSION="${PROJECT_VERSION}" APP_TITLE="${APP_TITLE}")
+target_link_libraries(Compendium PRIVATE mmcore borealis ${APP_PLATFORM_LIB})
 
 if(PLATFORM_SWITCH)
     set(APP_ICON ${CMAKE_CURRENT_SOURCE_DIR}/resources/img/icon.jpg)
-    add_custom_target(PersonaModManager.nro DEPENDS PersonaModManager app_resources
-        COMMAND ${NX_NACPTOOL_EXE} --create "${APP_TITLE}" "${APP_AUTHOR}" "${PROJECT_VERSION}" PersonaModManager.nacp
-        COMMAND ${NX_ELF2NRO_EXE} PersonaModManager.elf PersonaModManager.nro --icon=${APP_ICON}
-                --nacp=PersonaModManager.nacp --romfsdir=${APP_RESOURCES}
+    add_custom_target(Compendium.nro DEPENDS Compendium app_resources
+        COMMAND ${NX_NACPTOOL_EXE} --create "${APP_TITLE}" "${APP_AUTHOR}" "${PROJECT_VERSION}" Compendium.nacp
+        COMMAND ${NX_ELF2NRO_EXE} Compendium.elf Compendium.nro --icon=${APP_ICON}
+                --nacp=Compendium.nacp --romfsdir=${APP_RESOURCES}
     )
 endif()

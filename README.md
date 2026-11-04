@@ -3,15 +3,17 @@
 [![English](https://img.shields.io/badge/lang-English-d62027?style=for-the-badge)](README.md)
 [![Español](https://img.shields.io/badge/idioma-Espa%C3%B1ol-121212?style=for-the-badge)](README.es.md)
 
-<img src="resources/img/icon.jpg" width="128" alt="Persona Mod Manager icon">
+<img src="resources/img/icon.jpg" width="128" alt="Compendium icon">
 
-# Persona Mod Manager
+# Compendium
+
+*A mod manager for Persona games on Switch, named after the Compendium, where the games keep your Personas to summon again.*
 
 **Install and manage mods for Persona games on a modded Nintendo Switch, right on the console. No PC needed.**<br>
 Browse GameBanana, download a mod, and the app packs it into the game's files for you: it builds the
 `.CPK` archive Persona 5 Royal reads, on the Switch itself.
 
-[![Latest release](https://img.shields.io/github/v/release/SantiBros/PersonaModManager-NX?include_prereleases&style=for-the-badge&label=download&color=d62027&logo=github&logoColor=white)](../../releases)
+[![Latest release](https://img.shields.io/github/v/release/SantiBros/Compendium-NX?include_prereleases&style=for-the-badge&label=download&color=d62027&logo=github&logoColor=white)](../../releases)
 ![Status: first version](https://img.shields.io/badge/status-first%20version-fac775?style=for-the-badge)
 ![Nintendo Switch homebrew](https://img.shields.io/badge/Nintendo%20Switch-homebrew-121212?style=for-the-badge)
 ![Atmosphère](https://img.shields.io/badge/CFW-Atmosph%C3%A8re-121212?style=for-the-badge)
@@ -47,16 +49,16 @@ Browse GameBanana, download a mod, and the app packs it into the game's files fo
 - **PC mods adapted:** Reloaded-II mods for the PC version (P5R Essentials) are converted for the Switch when you install them.
 - **Load order and conflicts:** when two mods change the same file, the one higher in My mods wins, and the app tells you which files clash.
 - **On/off without deleting:** a copy of every mod is kept, so turning one off rebuilds the game's files without it.
-- **Add mods from anywhere:** GameBanana (browse, or type a mod's number), GitHub projects (their latest release), a link sent from your phone (scan a QR code), or archives copied to `switch/PersonaModManager/inbox`.
+- **Add mods from anywhere:** GameBanana (browse, or type a mod's number), GitHub projects (their latest release), a link sent from your phone (scan a QR code), or archives copied to `switch/Compendium/inbox`.
 - **Brings in your existing mods:** mods kept for **SimpleModManager** (`sd:/mods/…`) and a `PATCH1.CPK` you copied by hand can be added to the list.
 - **p5rcbt support:** install the p5rcbt Skyline plugin from Settings and change its options (60 FPS, the PC version's settings menu).
 - **Keeps your files safe:** anything already on the SD card where the app writes is set aside and put back when your mods are off.
 
 ## How to install
 
-1. Download **`PersonaModManager.nro`** from the [releases page](../../releases) (not "Source code").
-2. Copy it to `sd:/switch/PersonaModManager/PersonaModManager.nro`.
-3. Open the Homebrew Menu and start **Persona Mod Manager**. For the most memory, open the Homebrew Menu by holding **R** while starting a game, rather than from the Album.
+1. Download **`Compendium.nro`** from the [releases page](../../releases) (not "Source code").
+2. Copy it to `sd:/switch/Compendium/Compendium.nro`.
+3. Open the Homebrew Menu and start **Compendium**. For the most memory, open the Homebrew Menu by holding **R** while starting a game, rather than from the Album.
 
 To update, replace the `.nro`. Your mods and settings are kept.
 
@@ -68,7 +70,7 @@ the one for your mods, let it read them once (and again after a game update):
 1. Press **+** to close the app.
 2. Hold **L and R** and start Persona 5 Royal. Keep holding until the Homebrew Menu opens.
    (R opens the Homebrew Menu in place of the game; L turns mods off for that launch.)
-3. Open Persona Mod Manager. It reads the files by itself and tells you when it's done.
+3. Open Compendium. It reads the files by itself and tells you when it's done.
 
 It also reads the game's file list, which it uses to place files of mods that leave out their CPK folder.
 
@@ -78,7 +80,7 @@ It also reads the game's file list, which it uses to place files of mods that le
 |---|---|
 | **Browse** | GameBanana's Persona 5 Royal mods. **L/R**: Switch mods or PC mods · **Y**: change the order · **X**: search · **A**: install |
 | **Search** | Search by name or author, or type a mod's number (the end of its GameBanana link) |
-| **Add mods** | Files in `switch/PersonaModManager/inbox`, SimpleModManager's mods, a `PATCH1.CPK` copied by hand, a link from your phone, or a mod number |
+| **Add mods** | Files in `switch/Compendium/inbox`, SimpleModManager's mods, a `PATCH1.CPK` copied by hand, a link from your phone, or a mod number |
 | **My mods** | Your load order (top wins). **A**: on/off · **L/R**: move up/down · **X**: remove |
 | **Settings** | How mods are loaded, the game's own files, p5rcbt, background add-ons, storage |
 
@@ -103,7 +105,7 @@ Choose in **Settings → Load mods with**:
 
 - **PATCH1.CPK (no plugin)**, the default. The app builds `atmosphere/contents/01005CA01580E000/romfs/CPK/PATCH1.CPK`
   with your mods and the game's own PATCH1 files, and Atmosphère's LayeredFS loads it. Works on any game version.
-- **p5rcbt (Skyline plugin).** The app builds `p5r/bind/PersonaModManager.cpk`, which [p5rcbt](https://github.com/Raytwo/p5rcbt)
+- **p5rcbt (Skyline plugin).** The app builds `p5r/bind/Compendium.cpk`, which [p5rcbt](https://github.com/Raytwo/p5rcbt)
   adds to the game's files. The game's PATCH1.CPK stays untouched. p5rcbt only works with game version **1.0.2**;
   install it from Settings.
 
@@ -111,12 +113,12 @@ Choose in **Settings → Load mods with**:
 
 | Path | What |
 |---|---|
-| `switch/PersonaModManager/PersonaModManager.nro` | the app |
-| `switch/PersonaModManager/library/` | a copy of every installed mod |
-| `switch/PersonaModManager/inbox/` | put archives here to install them from Add mods |
-| `switch/PersonaModManager/original/` | the game's own PATCH1.CPK and file list |
-| `switch/PersonaModManager/backup/` | your own files the app set aside (put back when mods are off) |
-| `switch/PersonaModManager/state.json` | what's installed and built |
+| `switch/Compendium/Compendium.nro` | the app |
+| `switch/Compendium/library/` | a copy of every installed mod |
+| `switch/Compendium/inbox/` | put archives here to install them from Add mods |
+| `switch/Compendium/original/` | the game's own PATCH1.CPK and file list |
+| `switch/Compendium/backup/` | your own files the app set aside (put back when mods are off) |
+| `switch/Compendium/state.json` | what's installed and built |
 
 ## Troubleshooting
 
@@ -132,15 +134,15 @@ Choose in **Settings → Load mods with**:
 Switch build: [devkitPro](https://devkitpro.org/wiki/Getting_Started) with `switch-dev` and `switch-portlibs`.
 
 ```bash
-git clone --recursive https://github.com/SantiBros/PersonaModManager-NX
-cd PersonaModManager-NX
+git clone --recursive https://github.com/SantiBros/Compendium-NX
+cd Compendium-NX
 export DEVKITPRO=/opt/devkitpro
 cmake -S . -B build-switch -DPLATFORM_SWITCH=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build build-switch --target PersonaModManager.nro
+cmake --build build-switch --target Compendium.nro
 ```
 
-Core and tests on a computer (needs CMake, libarchive and curl): `cmake -S . -B build && cmake --build build && ./build/pmmtests`.
-`build/pmmcli` lists, extracts and packs CPKs, and shows how a mod archive would be installed.
+Core and tests on a computer (needs CMake, libarchive and curl): `cmake -S . -B build && cmake --build build && ./build/comptests`.
+`build/compcli` lists, extracts and packs CPKs, and shows how a mod archive would be installed.
 
 ## Credits
 

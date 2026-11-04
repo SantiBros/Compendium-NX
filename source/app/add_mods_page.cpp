@@ -148,7 +148,7 @@ void AddModsPage::rebuild() {
         l->setMargins(10, 0, 8, 6);
         list_->addView(l);
     };
-    section("From SD card · switch/PersonaModManager/inbox");
+    section("From SD card · switch/Compendium/inbox");
     brls::View* first = nullptr;
     auto files = inboxFiles();
     const auto& installed = AppState::get().snapshot().installedKeys;
@@ -184,7 +184,7 @@ void AddModsPage::rebuild() {
         if (!first || p.string() == focusedPath_) first = row;
     }
     if (files.empty()) {
-        auto* none = ui::label("No files yet. Copy " + inboxKinds() + " into switch/PersonaModManager/inbox on the SD card.", 15, ui::muted(), false);
+        auto* none = ui::label("No files yet. Copy " + inboxKinds() + " into switch/Compendium/inbox on the SD card.", 15, ui::muted(), false);
         none->setMargins(0, 6, 6, 6);
         list_->addView(none);
     }
@@ -361,7 +361,7 @@ void AddModsPage::showInboxFile(const mm::fs::path& path) {
                                  "; you'll pick options and see any clashes next, like any other install. Aemulus packages, "
                                  "PATCH1.CPK files, Atmosphère folders and PC (Reloaded-II) mods all work.",
                              16, nvgRGB(0xc8, 0xc8, 0xc8), false));
-    auto* more = ui::label("To add more, copy " + inboxKinds() + " into switch/PersonaModManager/inbox on the SD card, from a PC or over USB/FTP "
+    auto* more = ui::label("To add more, copy " + inboxKinds() + " into switch/Compendium/inbox on the SD card, from a PC or over USB/FTP "
                            "(for example with DBI or sys-ftpd). The file stays here after installing; X deletes it.",
                            15, ui::muted(), false);
     more->setMarginTop(14);
