@@ -258,6 +258,8 @@ SettingsPage::SettingsPage() : brls::Box(brls::Axis::COLUMN) {
     where->setText("Mod library folder");
     where->setDetailText("SD:/switch/Compendium");
     content->addView(where);
+    note("If something goes wrong, send switch/Compendium/log.txt with your report: it lists what was installed and "
+         "built, and any errors.");
 
     section("About");
     auto* about = ui::label(

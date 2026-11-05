@@ -8,6 +8,7 @@
 #include "app_state.hpp"
 #include "compat.hpp"
 #include "cpk.hpp"
+#include "log.hpp"
 #include "md5.hpp"
 #include "platform.hpp"
 
@@ -295,6 +296,8 @@ void InstallFlow::install(const ModDetails& d, const ModFile& file) {
     setWorking(cached ? "Unpacking…" : "Downloading…", 0);
 
     PendingInstall pending{st.game(), d, file, st.archivePathFor(file)};
+    mm::log::info("install \"" + d.summary.name + "\" (" + d.summary.sourceKey + "), file " + file.filename +
+                  (cached ? " (already downloaded)" : " from " + file.downloadUrl));
     auto work = st.workDirFor(file.id);
     auto prep = std::make_shared<mm::PreparedArchive>();
     auto cancel = cancel_;

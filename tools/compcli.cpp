@@ -12,6 +12,7 @@
 #include "cpk.hpp"
 #include "installer.hpp"
 #include "library.hpp"
+#include "log.hpp"
 
 using namespace mm;
 
@@ -58,6 +59,7 @@ int main(int argc, char** argv) {
             removeTree(work);
         } else if (cmd == "install" && argc >= 4) {
             fs::path sd = argv[2];
+            log::open(sd / "switch/Compendium/log.txt");  // like the app
             Library lib(sd, sd / "switch/Compendium");
             lib.load();
             auto work = sd / "switch/Compendium/work/cli";

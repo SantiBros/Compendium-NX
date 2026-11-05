@@ -10,6 +10,7 @@
 
 #include "cpk.hpp"
 #include "installer.hpp"
+#include "log.hpp"
 #include "nlohmann/json.hpp"
 #include "p5rcbt.hpp"
 #include "platform.hpp"
@@ -84,6 +85,26 @@ void AppState::init() {
     mm::fs::create_directories(inboxDir(), ec);
     for (const auto& g : mm::kGames) gameVersions_[g.game] = platform::gameVersion(g.game);
 
+    // The log file: what was installed and built, and what went wrong.
+    mm::log::setClock([] {
+        auto tm = platform::localTime(static_cast<int64_t>(std::time(nullptr)));
+        char buf[32];
+        std::strftime(buf, sizeof buf, "%Y-%m-%d %H:%M:%S", &tm);
+        return std::string(buf);
+    });
+    mm::log::open(dataDir_ / "log.txt");
+    {
+        const auto& v = gameVersions_[mm::Game::P5R];
+        mm::log::info(std::string("---- ") + APP_TITLE + " " + APP_VERSION + " started · Persona 5 Royal " +
+                      (v.empty() ? std::string("version unknown (not installed?)") : v) + " · opened " +
+                      (platform::runningAsGame(mm::Game::P5R) ? "from the game" : platform::fullMemory() ? "holding R on a game" : "from the Album") +
+                      " · " + formatSize(platform::freeSpaceBytes()) + " free");
+    }
+    brls::Logger::getLogEvent()->subscribe([](brls::Logger::TimePoint, brls::LogLevel level, std::string text) {
+        if (level == brls::LogLevel::LOG_ERROR) mm::log::error(text);
+        else if (level == brls::LogLevel::LOG_WARNING) mm::log::warn(text);
+    });
+
     http_ = std::make_unique<mm::CurlHttpClient>(platform::userAgent(), platform::caBundle());
     gb_ = std::make_unique<mm::gb::Client>(*http_);
     library_ = std::make_unique<mm::Library>(platform::sdRoot(), dataDir_);
@@ -106,6 +127,17 @@ void AppState::init() {
     runFileJob([this, staleWork](mm::Library& lib) {
         mm::removeTree(staleWork);  // leftovers from an install interrupted by a crash or power-off
         lib.load();
+        {
+            auto all = lib.mods(mm::Game::P5R);
+            size_t on = 0;
+            for (const auto* m : all) on += m->enabled;
+            const auto& b = lib.buildStatus(mm::Game::P5R);
+            mm::log::info(std::to_string(all.size()) + " mods installed, " + std::to_string(on) + " on · load mods with " +
+                          mm::deployModeKey(lib.mode(mm::Game::P5R)) + " · " +
+                          (b.target.empty() ? std::string("nothing built") : "built " + b.target + " (" + std::to_string(b.files) + " files)") +
+                          (lib.hasOriginalPatch(mm::Game::P5R) ? " · game's own PATCH1 kept" : " · game's own PATCH1 not read yet") +
+                          (mm::p5rcbt::installed(lib.sdRoot(), mm::Game::P5R) ? " · p5rcbt installed" : ""));
+        }
         publishSnapshot(lib);
         if (platform::runningAsGame(mm::Game::P5R)) captureGameFiles(lib);
     }, [](const std::string& err) {
@@ -160,6 +192,7 @@ void AppState::captureGameFiles(mm::Library& lib) {
     } catch (const std::exception& e) {
         status = std::string("Couldn't read them: ") + e.what();
     }
+    mm::log::info("reading the game's own files: " + status);
     std::lock_guard lock(statusMutex_);
     originalsStatus_ = status;
 }
@@ -190,6 +223,7 @@ std::string AppState::gameFilesSteps() {
 
 void AppState::shutdown() {
     saveSettings();
+    mm::log::info("---- closed");
     if (http_) http_->cancelAll();
     net_.stop();
     files_.stop();
@@ -238,6 +272,7 @@ void AppState::runFileJob(std::function<void(mm::Library&)> job, std::function<v
         } catch (const std::exception& e) {
             error = e.what();
         }
+        if (!error.empty()) mm::log::error(error);
         try {
             publishSnapshot(*library_);
         } catch (const std::exception& e) {

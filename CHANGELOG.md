@@ -1,6 +1,9 @@
 # Changelog
 
-## 0.1.0 (first version)
+## 0.0.1 (first test version)
+
+Not tested on a Switch yet: expect bugs. If something fails, send switch/Compendium/log.txt.
+
 
 - Persona 5 Royal: browse and search GameBanana's Switch and PC mods, download and install them on the console.
 - Builds the game's PATCH1.CPK on the Switch from the mods that are on (keeping the game's own PATCH1 files once
@@ -11,3 +14,4 @@
 - Add mods from the SD card inbox, SimpleModManager's mods folder, a PATCH1.CPK copied by hand, GitHub releases, a
   GameBanana mod number, or a link sent from a phone.
 - Installs and configures p5rcbt (60 FPS, PC settings menu).
+- Writes a log file (switch/Compendium/log.txt) with what was installed and built, and any errors.

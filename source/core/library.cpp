@@ -5,6 +5,7 @@
 #include <set>
 
 #include "cpk.hpp"
+#include "log.hpp"
 #include "nlohmann/json.hpp"
 
 namespace mm {
@@ -132,6 +133,7 @@ bool Library::load() {
         auto bad = path;
         bad += ".corrupt";
         fs::rename(path, bad, ec);
+        log::error("state.json couldn't be read; kept as state.json.corrupt and started with an empty list");
         return false;
     }
     const json modList = j.value("mods", json::array());
@@ -321,6 +323,10 @@ const ModRecord& Library::add(ModRecord record, const InstallSet& files, bool en
     bundleCache_.clear();
 
     record.enabled = enable;
+    log::info("install " + record.id + " \"" + record.name + "\" (" + record.format + "): " +
+              std::to_string(record.cpkFiles.size()) + " files, " + std::to_string(record.bundles.size()) + " CPKs, " +
+              std::to_string(record.sdFiles.size()) + " SD card files" + (existing ? ", replacing the installed one" : ""));
+    for (const auto& n : record.notes) log::info("  note: " + n);
     if (existing) {
         *existing = record;
     } else {
@@ -338,6 +344,7 @@ void Library::setEnabled(const std::string& id, bool enabled, const ProgressFn& 
     auto* m = findMut(id);
     if (!m || m->enabled == enabled) return;
     m->enabled = enabled;
+    log::info(std::string(enabled ? "turn on " : "turn off ") + id);
     apply(progress);
 }
 
@@ -346,6 +353,7 @@ void Library::remove(const std::string& id, const ProgressFn& progress) {
     if (!m) return;
     auto dir = modDir(*m);
     Game game = m->game;
+    log::info("remove " + id);
     m->enabled = false;
     apply(progress);
     mods_.erase(std::remove_if(mods_.begin(), mods_.end(), [&](const ModRecord& r) { return r.id == id; }), mods_.end());
@@ -371,12 +379,14 @@ void Library::move(const std::string& id, int delta, const ProgressFn& progress)
     ordered.erase(ordered.begin() + idx);
     ordered.insert(ordered.begin() + to, rec);
     renumber(ordered);
+    log::info("move " + id + " to position " + std::to_string(to + 1));
     apply(progress);
 }
 
 void Library::setMode(Game game, DeployMode mode, const ProgressFn& progress) {
     if (this->mode(game) == mode) return;
     gameState(game).mode = mode;
+    log::info(std::string("load mods with ") + deployModeKey(mode));
     apply(progress);
 }
 
@@ -436,6 +446,7 @@ void Library::backupFile(const std::string& target) {
     }
     moveFile(src, dst);
     backedUp_[key] = target;
+    log::info("set aside a file that was already on the SD card: " + target);
 }
 
 void Library::restoreBackup(const std::string& target) {
@@ -445,6 +456,7 @@ void Library::restoreBackup(const std::string& target) {
     auto src = dataDir_ / "backup" / fs::path(it->second);
     std::error_code ec;
     if (fs::exists(src, ec)) moveFile(src, sdRoot_ / fs::path(it->second));
+    log::info("put back " + it->second);
     pruneEmptyDirs(src.parent_path(), dataDir_ / "backup");
     backedUp_.erase(it);
 }
@@ -489,6 +501,7 @@ void Library::applySdFiles(const ProgressFn& progress) {
 
 void Library::removeOutput(GameState& gs) {
     if (gs.output.empty()) return;
+    log::info("no mods on: removed " + gs.output);
     removeFileAndPrune(sdRoot_ / fs::path(gs.output), sdRoot_);
     restoreBackup(gs.output);
     gs.output.clear();
@@ -574,6 +587,9 @@ void Library::applyCpk(Game game, bool force, const ProgressFn& progress) {
     status.files = result.files;
     status.bytes = result.bytes;
     gs.status = status;
+    log::info("built " + target + ": " + std::to_string(result.files) + " files, " + formatSize(result.bytes) +
+              (status.withOriginals ? ", with the game's own PATCH1 files"
+                                    : status.missingOriginals ? ", without the game's own PATCH1 files (not read yet)" : ""));
 }
 
 void Library::apply(const ProgressFn& progress) {

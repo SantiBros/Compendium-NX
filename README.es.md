@@ -14,7 +14,7 @@ Explora GameBanana, descarga un mod y la app lo integra en los archivos del jueg
 archivo `.CPK` que lee Persona 5 Royal.
 
 [![Última versión](https://img.shields.io/github/v/release/SantiBros/Compendium-NX?include_prereleases&style=for-the-badge&label=descargar&color=d62027&logo=github&logoColor=white)](../../releases)
-![Estado: primera versión](https://img.shields.io/badge/estado-primera%20versi%C3%B3n-fac775?style=for-the-badge)
+![Estado: en pruebas](https://img.shields.io/badge/estado-en%20pruebas-fac775?style=for-the-badge)
 ![Homebrew de Nintendo Switch](https://img.shields.io/badge/Nintendo%20Switch-homebrew-121212?style=for-the-badge)
 ![Atmosphère](https://img.shields.io/badge/CFW-Atmosph%C3%A8re-121212?style=for-the-badge)
 [![Licencia: GPL v3](https://img.shields.io/badge/licencia-GPL%20v3-121212?style=for-the-badge)](LICENSE)
@@ -122,6 +122,7 @@ Elige en **Settings → Load mods with** (Ajustes → Cargar mods con):
 | `switch/Compendium/original/` | el PATCH1.CPK propio del juego y su lista de archivos |
 | `switch/Compendium/backup/` | tus propios archivos que la app apartó (vuelven cuando los mods están apagados) |
 | `switch/Compendium/state.json` | qué está instalado y armado |
+| `switch/Compendium/log.txt` | lo que hizo la app y cualquier error: envíalo al reportar un problema |
 
 ## Solución de problemas
 
@@ -130,7 +131,7 @@ Elige en **Settings → Load mods with** (Ajustes → Cargar mods con):
 - **"No se pudo conectar con GameBanana" / errores de conexión segura:** revisa la fecha y hora de la Switch, y luego tu Wi-Fi.
 - **Error de Atmosphère con Program ID 010041544D530000:** suele deberse a complementos en segundo plano que usan la memoria que Atmosphère necesita para cargar mods. Apágalos en Ajustes y reinicia.
 - **El modo p5rcbt no hace nada:** p5rcbt necesita la versión 1.0.2 del juego; revisa que esté instalado y encendido en Mis mods.
-- **La app se cierra con un error:** abre un [issue](../../issues) y adjunta el archivo más reciente de `atmosphere/crash_reports`.
+- **Algo sale mal:** abre un [issue](../../issues) y adjunta `switch/Compendium/log.txt` (y, si la app se cerró, el archivo más reciente de `atmosphere/crash_reports`).
 
 ## Compilar
 

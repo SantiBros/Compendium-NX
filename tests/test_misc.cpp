@@ -69,3 +69,21 @@ TEST("version checks know P5R's versions") {
     CHECK(checkCompat("1.0.2", {"1.0.2"}) == Compat::Likely);
     CHECK(checkCompat("1.0.0", {"1.0.2"}) == Compat::Mismatch);
 }
+
+#include "log.hpp"
+
+TEST("log file: lines, and a new file once it's full") {
+    t::TempDir tmp;
+    auto file = tmp.path / "log.txt";
+    log::open(file, 200);
+    log::setClock([] { return std::string("T"); });
+    log::info("first\nsecond");
+    CHECK_EQ(th::read(file), std::string("T [INFO] first\n    second\n"));
+    for (int i = 0; i < 20; ++i) log::error("line " + std::to_string(i));
+    CHECK(fs::exists(tmp.path / "log.old.txt"));
+    CHECK(fs::file_size(file) < 200);
+    log::close();
+    log::setClock({});
+    log::info("not written once closed");
+    CHECK(th::read(file).find("not written") == std::string::npos);
+}

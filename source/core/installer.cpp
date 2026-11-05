@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include "log.hpp"
+
 namespace mm {
 
 PreparedArchive prepareArchive(const fs::path& archive, const fs::path& workDir, Game game, const PathResolver& resolve,
@@ -24,6 +26,19 @@ PreparedArchive prepareArchive(const fs::path& archive, const fs::path& workDir,
         throw std::runtime_error("this kind of file can't be installed: " + archive.filename().string());
     }
     out.layout = detectPersonaLayout(out.extractDir, game, resolve);
+    const auto& l = out.layout;
+    log::info("unpacked " + archive.filename().string() + ": " + std::to_string(l.variants.size()) +
+              (l.variants.size() == 1 ? " option" : " options") + (l.pcMod ? " (PC mod)" : ""));
+    for (const auto& v : l.variants) {
+        size_t inCpks = 0;
+        for (const auto& c : v.cpks) inCpks += c.files;
+        log::info("  " + (v.name.empty() ? std::string("(main)") : v.name) + ": " + formatName(v.format) + ", " +
+                  std::to_string(v.files.size()) + " files, " + std::to_string(v.cpks.size()) + " CPKs (" +
+                  std::to_string(inCpks) + " files), " + std::to_string(v.sdFiles.size()) + " SD card files");
+        for (const auto& n : v.notes) log::info("    note: " + n);
+    }
+    for (const auto& w : l.warnings) log::warn("  " + w);
+    if (!l.problem.empty()) log::warn("  can't install: " + l.problem);
     return out;
 }
 

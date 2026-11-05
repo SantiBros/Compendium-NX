@@ -14,7 +14,7 @@ Browse GameBanana, download a mod, and the app packs it into the game's files fo
 `.CPK` archive Persona 5 Royal reads, on the Switch itself.
 
 [![Latest release](https://img.shields.io/github/v/release/SantiBros/Compendium-NX?include_prereleases&style=for-the-badge&label=download&color=d62027&logo=github&logoColor=white)](../../releases)
-![Status: first version](https://img.shields.io/badge/status-first%20version-fac775?style=for-the-badge)
+![Status: testing](https://img.shields.io/badge/status-testing-fac775?style=for-the-badge)
 ![Nintendo Switch homebrew](https://img.shields.io/badge/Nintendo%20Switch-homebrew-121212?style=for-the-badge)
 ![Atmosphère](https://img.shields.io/badge/CFW-Atmosph%C3%A8re-121212?style=for-the-badge)
 [![License: GPL v3](https://img.shields.io/badge/license-GPL%20v3-121212?style=for-the-badge)](LICENSE)
@@ -119,6 +119,7 @@ Choose in **Settings → Load mods with**:
 | `switch/Compendium/original/` | the game's own PATCH1.CPK and file list |
 | `switch/Compendium/backup/` | your own files the app set aside (put back when mods are off) |
 | `switch/Compendium/state.json` | what's installed and built |
+| `switch/Compendium/log.txt` | what the app did and any errors: send it with bug reports |
 
 ## Troubleshooting
 
@@ -127,7 +128,7 @@ Choose in **Settings → Load mods with**:
 - **"Couldn't reach GameBanana" / secure connection errors:** check the Switch's date and time, then your Wi-Fi.
 - **Atmosphère error with Program ID 010041544D530000:** usually background add-ons using the memory Atmosphère needs to load mods. Turn them off in Settings and restart.
 - **p5rcbt mode does nothing:** p5rcbt needs game version 1.0.2; check that it's installed and on in My mods.
-- **The app closes with an error:** please open an [issue](../../issues) and attach the newest file from `atmosphere/crash_reports`.
+- **Something goes wrong:** please open an [issue](../../issues) and attach `switch/Compendium/log.txt` (and, if the app crashed, the newest file from `atmosphere/crash_reports`).
 
 ## Building
 
