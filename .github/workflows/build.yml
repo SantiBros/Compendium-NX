@@ -62,10 +62,31 @@ jobs:
         with:
           name: Compendium
           path: build-switch/Compendium.nro
+      # A new version is released by the first push to main that has its VERSION and its notes
+      # (docs/releases/v<version>.md); the tag is made here. Later pushes leave it as it is.
+      - name: New version?
+        id: version
+        shell: bash
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="v$(head -n1 VERSION | tr -d '[:space:]')"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          create=false
+          if [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF" = refs/heads/main ] && [ -f "docs/releases/$tag.md" ]; then
+            code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $TOKEN" \
+                   "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$tag")
+            [ "$code" = 404 ] && create=true
+          fi
+          echo "create=$create" >> "$GITHUB_OUTPUT"
+          echo "$tag: release needed = $create"
       - name: Release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: steps.version.outputs.create == 'true' || startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: Compendium ${{ steps.version.outputs.tag }}
           files: build-switch/Compendium.nro
-          body_path: docs/releases/${{ github.ref_name }}.md
-          prerelease: ${{ startsWith(github.ref_name, 'v0.0.') }}
+          body_path: docs/releases/${{ steps.version.outputs.tag }}.md
+          prerelease: ${{ startsWith(steps.version.outputs.tag, 'v0.0.') }}
