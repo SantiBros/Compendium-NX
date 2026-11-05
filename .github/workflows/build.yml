@@ -7,6 +7,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write  # publish releases, and the build log on failure
+
 jobs:
   tests:
     name: Core tests (Linux)
@@ -16,10 +19,17 @@ jobs:
       - name: Install libraries
         run: sudo apt-get update && sudo apt-get install -y libarchive-dev libcurl4-openssl-dev ninja-build
       - name: Build and run the tests
+        shell: bash
         run: |
-          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          cmake --build build
-          ./build/comptests
+          mkdir -p logs
+          { cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build && ./build/comptests; } 2>&1 | tee logs/tests.log
+          exit ${PIPESTATUS[0]}
+      - name: Share the log
+        if: failure()
+        uses: ./.github/actions/share-log
+        with:
+          name: tests
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   switch:
     name: Switch (.nro)
@@ -30,14 +40,24 @@ jobs:
         with:
           submodules: recursive
       - name: Portlibs
+        shell: bash
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          dkp-pacman -Sy --noconfirm --needed switch-portlibs
+          dkp-pacman -Sy --noconfirm --needed switch-portlibs || true
       - name: Build
+        shell: bash
         run: |
           export DEVKITPRO=/opt/devkitpro
-          cmake -S . -B build-switch -DPLATFORM_SWITCH=ON -DCMAKE_BUILD_TYPE=Release
-          cmake --build build-switch --target Compendium.nro -j"$(nproc)"
+          mkdir -p logs
+          { cmake -S . -B build-switch -DPLATFORM_SWITCH=ON -DCMAKE_BUILD_TYPE=Release \
+              && cmake --build build-switch --target Compendium.nro -j"$(nproc)"; } 2>&1 | tee logs/switch.log
+          exit ${PIPESTATUS[0]}
+      - name: Share the log
+        if: failure()
+        uses: ./.github/actions/share-log
+        with:
+          name: switch
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           name: Compendium
@@ -47,4 +67,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: build-switch/Compendium.nro
-          draft: true
+          body_path: docs/releases/${{ github.ref_name }}.md
+          prerelease: ${{ startsWith(github.ref_name, 'v0.0.') }}

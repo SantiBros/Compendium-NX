@@ -1,0 +1,22 @@
+name: Share the build log
+description: Puts logs/<name>.log on the ci-logs branch, so a failed build can be read without signing in.
+inputs:
+  name:
+    required: true
+  token:
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -e
+        tmp=$(mktemp -d)
+        tail -c 300000 "logs/${{ inputs.name }}.log" > "$tmp/${{ inputs.name }}.log" || echo "no log" > "$tmp/${{ inputs.name }}.log"
+        echo "$GITHUB_SHA" > "$tmp/${{ inputs.name }}.sha"
+        cd "$tmp"
+        git init -q
+        git checkout -q -b ci-logs-${{ inputs.name }}
+        git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com add .
+        git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Failed build log for $GITHUB_SHA"
+        git push -qf "https://x-access-token:${{ inputs.token }}@github.com/${GITHUB_REPOSITORY}.git" ci-logs-${{ inputs.name }}
