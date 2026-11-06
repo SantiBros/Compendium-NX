@@ -256,7 +256,8 @@ Elige en **Settings → Load mods with**:
 | Mods de PC (Reloaded-II) | 🧪 Se adaptan los archivos del juego; ❌ los mods de código `.dll` no pueden funcionar en la Switch |
 | Modo p5rcbt y sus ajustes | 🧪 Solo la versión 1.0.2 del juego |
 | Combinación de Aemulus (`.flow`, `.msg`, `.tblpatch`, sprites, parches binarios) | ❌ Todavía no |
-| Persona 4 Golden, Persona 3 Portable, Persona 5 Strikers, Persona 5 Tactica, Persona 4 Arena Ultimax | ❌ Previstos para versiones futuras |
+| Una interfaz nueva | 🔜 Prevista: el diseño de la app va a cambiar en versiones futuras |
+| Persona 4 Golden, Persona 3 Portable, Persona 5 Strikers, Persona 5 Tactica, Persona 4 Arena Ultimax | 🔜 Previstos para versiones futuras |
 
 **Problemas conocidos**
 - La 0.0.1 no puede instalar mods en una Switch: usa la 0.0.2.

@@ -243,7 +243,8 @@ Choose in **Settings → Load mods with**:
 | PC mods (Reloaded-II) | 🧪 Game files adapted; ❌ `.dll` code mods can't run on the Switch |
 | p5rcbt mode and its settings | 🧪 Game version 1.0.2 only |
 | Aemulus merging (`.flow`, `.msg`, `.tblpatch`, sprites, binary patches) | ❌ Not yet |
-| Persona 4 Golden, Persona 3 Portable, Persona 5 Strikers, Persona 5 Tactica, Persona 4 Arena Ultimax | ❌ Planned for later versions |
+| A new interface | 🔜 Planned: the app's look will change in later versions |
+| Persona 4 Golden, Persona 3 Portable, Persona 5 Strikers, Persona 5 Tactica, Persona 4 Arena Ultimax | 🔜 Planned for later versions |
 
 **Known issues**
 - 0.0.1 can't install mods on a Switch: use 0.0.2.

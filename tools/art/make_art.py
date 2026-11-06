@@ -9,6 +9,7 @@ NFS Most Wanted 2012 and Spider-Man 2 ports' art.
 
 make_art.py post <fonts dir> <screenshots dir> <out.jpg> <en|es> <label> <shot.jpg=caption>...: a 1920x1080 picture
 for announcing a version (Reddit, Facebook, Discord), with three screenshots and their captions.
+make_art.py coming <fonts dir> <icon.png> <out.jpg> <en|es>: a 1920x1080 picture of what's planned.
 
 The screenshots dir holds browse.jpg (docs/images/screenshots). The font is Barlow Condensed (SIL Open Font
 License 1.1), not included: the fonts dir holds BarlowCondensed-<weight>-<normal|italic>.ttf, e.g. from the
@@ -392,11 +393,66 @@ def post(shots, out, lang, label, pictures):
     img.save(out, quality=92)
 
 
+COMING = {
+    "en": {"label": "COMPENDIUM  ·  COMING NEXT", "title": "WHAT'S NEXT",
+           "ui": "A NEW INTERFACE", "ui_sub": "The app's look will change in future versions.",
+           "games": "MORE GAMES FROM THE SERIES", "now": "AVAILABLE NOW"},
+    "es": {"label": "COMPENDIUM  ·  PRÓXIMAMENTE", "title": "LO QUE VIENE",
+           "ui": "UNA INTERFAZ NUEVA", "ui_sub": "El diseño de la app va a cambiar en próximas versiones.",
+           "games": "MÁS JUEGOS DE LA SAGA", "now": "YA DISPONIBLE"},
+}
+COMING_GAMES = ["PERSONA 4 GOLDEN", "PERSONA 3 PORTABLE", "PERSONA 5 STRIKERS", "PERSONA 5 TACTICA",
+                "PERSONA 4 ARENA ULTIMAX"]
+
+
+def coming(out, lang, icon_png):
+    """1920x1080, for announcements: what's planned (a new interface, the other Persona games)."""
+    t = COMING[lang]
+    W, H = 1920, 1080
+    img = Image.new("RGB", (W, H), BG)
+    glow = Image.new("RGB", (W, H), (26, 32, 52))
+    img.paste(glow, (0, 0), fade_mask(W, H, -W, int(W * 0.9), 1.0).transpose(Image.FLIP_LEFT_RIGHT))
+    # the icon on the right, over red blades
+    shards(img, 1560, 470, 560, -6)
+    ic = Image.open(icon_png).convert("RGB").resize((470, 470), Image.LANCZOS)
+    mask = Image.new("L", ic.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, ic.width - 1, ic.height - 1], radius=60, fill=255)
+    img.paste(ic, (1560 - 235, 470 - 235), mask)
+    d = ImageDraw.Draw(img)
+    x0 = 100
+    spaced(d, (x0, 70), t["label"], font(700, False, 40), RED, 8)
+    d.text((x0 - 6, 112), t["title"], font=font(900, True, 168), fill=WHITE)
+    y = 330
+    d.rectangle([x0, y + 22, x0 + 40, y + 32], fill=RED)
+    d.text((x0 + 62, y), t["ui"], font=font(800, True, 70), fill=WHITE)
+    d.text((x0 + 62, y + 88), t["ui_sub"], font=font(500, False, 40), fill=GRAY)
+    y = 520
+    d.rectangle([x0, y + 22, x0 + 40, y + 32], fill=RED)
+    d.text((x0 + 62, y), t["games"], font=font(800, True, 70), fill=WHITE)
+    bf = font(700, False, 36)
+    x, yy = x0 + 62, y + 104
+    x = badge(d, x, yy, "PERSONA 5 ROYAL  ·  " + t["now"], bf, True, 22, 62) + 16
+    x, yy = x0 + 62, yy + 80
+    for g in COMING_GAMES:
+        w = int(d.textlength(g, font=bf)) + 44
+        if x + w > 1180:
+            x, yy = x0 + 62, yy + 80
+        x = badge(d, x, yy, g, bf, False, 22, 62) + 16
+    d.text((x0, H - 62), "github.com/SantiBros/Compendium-NX  ·  ko-fi.com/santibros", font=font(500, False, 32), fill=GRAY)
+    red_rule(img, H - 10, 0, W, 10, int(W * 0.55))
+    img.save(out, quality=92)
+
+
 if __name__ == "__main__":
     if len(sys.argv) >= 8 and sys.argv[1] == "post":
         # make_art.py post <fonts dir> <screenshots dir> <out.jpg> <en|es> <label> <shot.jpg=caption>...
         FONTS, shots, out, lang, label = sys.argv[2:7]
         post(shots, out, lang, label, [tuple(a.split("=", 1)) for a in sys.argv[7:]])
+        sys.exit(0)
+    if len(sys.argv) == 6 and sys.argv[1] == "coming":
+        # make_art.py coming <fonts dir> <icon.png> <out.jpg> <en|es>
+        FONTS, icon_png, out, lang = sys.argv[2:6]
+        coming(out, lang, icon_png)
         sys.exit(0)
     if len(sys.argv) < 4:
         sys.exit(__doc__)
