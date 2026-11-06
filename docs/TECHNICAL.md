@@ -198,6 +198,9 @@ source/third_party/     nlohmann/json, Nayuki's QR Code generator
 library/borealis/       the interface library (submodule)
 tests/                  comptests
 tools/compcli.cpp       the core from the command line
-tools/art/make_art.py   the README's art and the icon
+tools/art/make_art.py   the README's art, the icon and the pictures for announcing a version
+tools/make_release.sh   packs a release's zip (switch/Compendium/…)
+tools/publish_release.sh  creates and updates the GitHub releases (run by CI)
+tools/package/          README.txt for the release zip
 resources/              romfs: CA certificates, third-party notices, icon
 ```

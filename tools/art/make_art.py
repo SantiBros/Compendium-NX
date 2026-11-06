@@ -7,6 +7,9 @@ NFS Most Wanted 2012 and Spider-Man 2 ports' art.
   install-steps.png       2400x760, the four install steps (and install-steps.es.png, in Spanish)
   icon.png                512x512, the app's icon (resources/img/icon.jpg is the same at 256x256)
 
+make_art.py post <fonts dir> <screenshots dir> <out.jpg> <en|es> <label> <shot.jpg=caption>...: a 1920x1080 picture
+for announcing a version (Reddit, Facebook, Discord), with three screenshots and their captions.
+
 The screenshots dir holds browse.jpg (docs/images/screenshots). The font is Barlow Condensed (SIL Open Font
 License 1.1), not included: the fonts dir holds BarlowCondensed-<weight>-<normal|italic>.ttf, e.g. from the
 @fontsource/barlow-condensed package converted with fontTools."""
@@ -213,12 +216,12 @@ def icon_cards(d, x, y, s, c, w):
 
 
 STEPS = {
-    "en": [("DOWNLOAD", [("get ", 0), ("Compendium.nro", 1), (" from the ", 0), ("Releases", 1), (" page (under Assets)", 0)], icon_download),
-           ("COPY TO SD", [("put it on the SD card in ", 0), ("switch/Compendium/", 1)], icon_sd),
+    "en": [("DOWNLOAD", [("get the ", 0), ("zip", 1), (" from the ", 0), ("Releases", 1), (" page, under Assets", 0)], icon_download),
+           ("COPY TO SD", [("unzip it and copy its ", 0), ("switch", 1), (" folder to the root of your SD card", 0)], icon_sd),
            ("OPEN", [("hold ", 0), ("R", 1), (" while starting any game, then open ", 0), ("Compendium", 1)], icon_play),
            ("PICK MODS", [("press ", 0), ("A", 1), (" on a mod to install it, then start ", 0), ("Persona\u00a05\u00a0Royal", 1)], icon_cards)],
-    "es": [("DESCARGA", [("baja ", 0), ("Compendium.nro", 1), (" de la página de ", 0), ("Releases", 1), (" (en Assets)", 0)], icon_download),
-           ("COPIA A LA SD", [("ponlo en la tarjeta SD, en ", 0), ("switch/Compendium/", 1)], icon_sd),
+    "es": [("DESCARGA", [("baja el ", 0), ("zip", 1), (" de la página de ", 0), ("Releases", 1), (", en Assets", 0)], icon_download),
+           ("COPIA A LA SD", [("descomprímelo y copia su carpeta ", 0), ("switch", 1), (" en la raíz de tu tarjeta SD", 0)], icon_sd),
            ("ABRE", [("mantén ", 0), ("R", 1), (" al abrir un juego y elige ", 0), ("Compendium", 1)], icon_play),
            ("ELIGE MODS", [("pulsa ", 0), ("A", 1), (" en un mod para instalarlo y abre ", 0), ("Persona\u00a05\u00a0Royal", 1)], icon_cards)],
 }
@@ -342,7 +345,59 @@ def icon(out, app_icon):
         img.resize((256, 256), Image.LANCZOS).save(app_icon, quality=95)
 
 
+POST_TEXT = {
+    "en": ("MOD MANAGER FOR NINTENDO SWITCH", ["BUILDS THE CPK ON THE CONSOLE", "GAMEBANANA BUILT IN", "NO PC NEEDED"]),
+    "es": ("GESTOR DE MODS PARA NINTENDO SWITCH", ["ARMA EL CPK EN LA CONSOLA", "GAMEBANANA INTEGRADO", "SIN PC"]),
+}
+
+
+def post(shots, out, lang, label, pictures):
+    """1920x1080, for announcing a version: the title, a label (the version), and three screenshots with
+    captions. pictures: [(file in the screenshots dir, caption)]."""
+    W, H = 1920, 1080
+    img = Image.new("RGB", (W, H), BG)
+    glow = Image.new("RGB", (W, H), (26, 32, 52))
+    img.paste(glow, (0, 0), fade_mask(W, H, -W, int(W * 0.9), 1.0).transpose(Image.FLIP_LEFT_RIGHT))
+    d = ImageDraw.Draw(img)
+    x0 = 100
+    spaced(d, (x0, 62), label.upper(), font(700, False, 40), RED, 8)
+    d.text((x0 - 6, 100), "COMPENDIUM", font=font(900, True, 212), fill=WHITE)
+    big = font(900, True, 150)
+    d.text((x0, 318), "PERSONA", font=big, fill=RED)
+    x = x0 + int(d.textlength("PERSONA", font=big)) + 30
+    sub, chips = POST_TEXT[lang]
+    d.text((x, 384), sub, font=font(700, True, 60), fill=LIGHT)
+    bf = font(700, False, 34)
+    x = x0
+    for i, c in enumerate(chips):
+        x = badge(d, x, 488, c, bf, i == 0, 22, 58) + 16
+    # three screenshots in a row, with a caption under each
+    n, gap, top = len(pictures), 40, 590
+    sw = (W - 2 * x0 - (n - 1) * gap) // n
+    sh = sw * 9 // 16
+    cf = font(600, False, 34)
+    for i, (name, caption) in enumerate(pictures):
+        x = x0 + i * (sw + gap)
+        shot = Image.open(os.path.join(shots, name)).convert("RGB").resize((sw, sh), Image.LANCZOS)
+        d.rectangle([x - 4, top - 4, x + sw + 3, top + sh + 3], fill=LINE)
+        img.paste(shot, (x, top))
+        d.rectangle([x, top + sh + 4, x + 46, top + sh + 10], fill=RED)
+        lines = wrap_runs(d, [(caption, 0)], {0: cf}, sw)
+        y = top + sh + 22
+        for line in lines[:2]:
+            d.text((x, y), "".join(t for t, _ in line), font=cf, fill=LIGHT)
+            y += 42
+    d.text((x0, H - 62), "github.com/SantiBros/Compendium-NX  ·  ko-fi.com/santibros", font=font(500, False, 32), fill=GRAY)
+    red_rule(img, H - 10, 0, W, 10, int(W * 0.55))
+    img.save(out, quality=92)
+
+
 if __name__ == "__main__":
+    if len(sys.argv) >= 8 and sys.argv[1] == "post":
+        # make_art.py post <fonts dir> <screenshots dir> <out.jpg> <en|es> <label> <shot.jpg=caption>...
+        FONTS, shots, out, lang, label = sys.argv[2:7]
+        post(shots, out, lang, label, [tuple(a.split("=", 1)) for a in sys.argv[7:]])
+        sys.exit(0)
     if len(sys.argv) < 4:
         sys.exit(__doc__)
     FONTS, shots, out = sys.argv[1:4]

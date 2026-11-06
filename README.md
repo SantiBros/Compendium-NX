@@ -35,14 +35,24 @@ itself. No PC, no CriPakTools, no copying folders by hand.
 > many mods made for the PC version ([which ones](#which-mods-work)), but it doesn't mod the PC game.
 
 > [!NOTE]
-> **First test version (0.0.1).** Everything works on the app's PC test build, with test mods, but it hasn't
-> been tried on a console yet. Expect bugs, back up your saves, and use emuMMC. Reports from consoles help
-> the most: see [Help wanted](#help-wanted-testers).
+> **Tested on a Switch.** 0.0.1 opened and browsed GameBanana's mods on a Switch Lite, but installing a mod, simple
+> or big, stopped with "cannot make canonical path". 0.0.2 fixes that. It's still a test version: back up your
+> saves, use emuMMC, and [tell us](#help-wanted-testers) how installing mods and playing with them goes.
+
+> [!TIP]
+> **New in 0.0.2: mods install on the Switch.** The error that stopped every install in 0.0.1 is fixed, and mods
+> 0.0.1 already downloaded install without downloading again. The release is now a zip with the `switch` folder
+> ready to copy onto the SD card, with a short guide in English and Spanish. And a new icon.
+>
+> **0.0.1, the first version:** GameBanana's Persona 5 Royal mods (Switch and PC) on the console, the game's
+> `PATCH1.CPK` built on the Switch, Aemulus packages and other mod formats, load order and conflicts, p5rcbt.
+>
+> All the details are in the [changelog](CHANGELOG.md).
 
 ## Screenshots
 
-<p align="center"><sub>Taken on the app's PC test build at the Switch's 1280×720, with sample listings in place of
-GameBanana's: on the console, every mod shows its own pictures and description.</sub></p>
+<p align="center"><sub>Shown with sample listings in place of GameBanana's: on the console, every mod shows its own
+pictures and description.</sub></p>
 
 <table>
   <tr>
@@ -121,11 +131,14 @@ GameBanana's: on the console, every mod shows its own pictures and description.<
 > Menu: the community guide [switch.hacks.guide](https://switch.hacks.guide/) explains it step by step.
 > Unsure what emuMMC, LayeredFS or a CPK are? See the [glossary](docs/INSTALL.md#glossary).
 
-<img src="docs/images/install-steps.png" alt="Install in 4 steps: download Compendium.nro, copy it to switch/Compendium on the SD card, open it with R + any game, press A on a mod and start Persona 5 Royal" width="100%">
+<img src="docs/images/install-steps.png" alt="Install in 4 steps: download the zip, copy its switch folder to the SD card, open Compendium with R + any game, press A on a mod and start Persona 5 Royal" width="100%">
 
-1. **Download.** On the [Releases](../../releases) page, under **Assets**, download **`Compendium.nro`** (not
-   "Source code", which is only for developers).
-2. **Copy to the SD card.** Put it in `switch/Compendium/` on your SD card (make the folder if it isn't there).
+1. **Download.** On the [Releases](../../releases) page, under **Assets**, download **`Compendium-<version>.zip`**
+   (not "Source code", which is only for developers).
+2. **Copy to the SD card.** Unzip it and copy its **`switch`** folder to the root of your SD card. It joins the
+   `switch` folder already there, and the app ends up in `switch/Compendium/`. On a Mac, copy just the
+   `Compendium` folder into your SD card's `switch` folder instead (Finder replaces folders rather than joining
+   them).
 3. **Open.** Hold **R** while you start any game to open the Homebrew Menu, then choose **Compendium**.
 4. **Pick mods.** On **Browse**, press **A** on a mod, then **A** on its file. Press **+** to close the app and
    start Persona 5 Royal: your mods are in.
@@ -153,6 +166,8 @@ It also reads the game's file list, which it uses to place the files of mods tha
 sd:/
 ├── switch/Compendium/
 │   ├── Compendium.nro       the app
+│   ├── README.txt           a short guide, in English and Spanish
+│   ├── LICENSES.txt         Compendium's license and the open-source components it uses
 │   ├── library/             a copy of every installed mod
 │   ├── inbox/               put archives here to install them from Add mods
 │   ├── original/            the game's own PATCH1.CPK and file list (the one-time step)
@@ -172,7 +187,8 @@ The [full install guide](docs/INSTALL.md) covers updating, backups, getting mods
 
 ### Updating
 
-Replace `Compendium.nro` with the new one. Your mods, load order and settings are kept.
+Copy the new zip's `switch` folder over the old one (or just replace `Compendium.nro`). Your mods, load order and
+settings are kept.
 
 ## Using it
 
@@ -214,23 +230,23 @@ Choose in **Settings → Load mods with**:
 ## Status
 
 > [!NOTE]
-> **Testing.** Version 0.0.1 is the first one. The app's core (the CPK builder, the mod formats, the load
-> order) is checked by automated tests on every change, and the whole app runs on a PC test build, but no
-> console has loaded its mods yet. Back up your saves and use emuMMC.
+> **Testing.** The app opens and browses GameBanana on a Switch. 0.0.2 fixes installing mods there, and the next
+> reports will say how installing and playing with mods goes. The app's core (the CPK builder, the mod formats, the
+> load order) is checked by automated tests on every change. Back up your saves and use emuMMC.
 
 | Part | State |
 |---|---|
-| Persona 5 Royal | 🧪 First version: waiting for the first reports from consoles |
-| Building PATCH1.CPK (default mode) | 🧪 Checked by tests; not yet loaded by the game on a console |
-| Browse, search and download from GameBanana | 🧪 Works on the PC test build |
-| Aemulus packages, CPKs, Atmosphère / SimpleModManager / p5rcbt folders, loose files | 🧪 Works on the PC test build |
+| Opening the app, browsing and searching GameBanana | ✅ Works on a Switch |
+| Downloading and installing mods | 🧪 Failed on a Switch in 0.0.1 ("cannot make canonical path"); fixed in 0.0.2, waiting for reports |
+| Building PATCH1.CPK (default mode) | 🧪 Checked by tests; waiting for reports of mods showing in the game |
+| Aemulus packages, CPKs, Atmosphère / SimpleModManager / p5rcbt folders, loose files | 🧪 Checked by tests; waiting for reports |
 | PC mods (Reloaded-II) | 🧪 Game files adapted; ❌ `.dll` code mods can't run on the Switch |
 | p5rcbt mode and its settings | 🧪 Game version 1.0.2 only |
 | Aemulus merging (`.flow`, `.msg`, `.tblpatch`, sprites, binary patches) | ❌ Not yet |
 | Persona 4 Golden, Persona 3 Portable, Persona 5 Strikers, Persona 5 Tactica, Persona 4 Arena Ultimax | ❌ Planned for later versions |
 
 **Known issues**
-- None reported yet: the first console reports will shape 0.0.2.
+- 0.0.1 can't install mods on a Switch: use 0.0.2.
 
 See the [changelog](CHANGELOG.md) for what changed in each version.
 

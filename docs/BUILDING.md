@@ -105,14 +105,31 @@ The fonts dir holds `BarlowCondensed-<weight>-<normal|italic>.ttf`, for example 
 ## Making a release
 
 1. Set the version in [`VERSION`](../VERSION). Versions 0.0.x are test versions, published as pre-releases.
-2. Add the version to [`CHANGELOG.md`](../CHANGELOG.md), in players' words.
+2. Add the version to [`CHANGELOG.md`](../CHANGELOG.md), in players' words, and to the "New in" box at the top of
+   both READMEs.
 3. Write the release notes in `docs/releases/v<version>.md`, English then Spanish, in the same order every time:
    one line on what the version brings and the "no game files" box; **"Which file do I download?" /
-   "¿Qué archivo descargo?"** (`Compendium.nro` is the only file players need; "Source code" is added by GitHub
-   and has nothing to run); what's new; how to install and update; known issues.
-4. Push to `main`. The workflow builds the `.nro` and, the first time it sees a version that has notes and no
-   release yet, creates the tag `v<version>` and the release with `Compendium.nro` attached and the notes as its
-   text. Later pushes with the same version leave the release as it is.
+   "¿Qué archivo descargo?"** (`Compendium-<version>.zip` is the only file players need; "Source code" is added by
+   GitHub and has nothing to run); how to install and update; what's new; known issues; and at the end the line
+   ``Compendium.nro SHA-256: `{NRO_SHA256}` ``, which is filled in with the released `.nro`'s checksum.
+4. Push to `main`. The workflow builds the `.nro`, runs the tests, and packs the zip with `tools/make_release.sh`:
+
+   ```
+   Compendium-<version>.zip
+   └── switch/Compendium/
+       ├── Compendium.nro   the app
+       ├── README.txt       a short guide for players, English and Spanish (tools/package/README.txt)
+       ├── LICENSES.txt     Compendium's license and the third-party notices
+       └── inbox/           empty: mod archives go here
+   ```
+
+   Players copy the `switch` folder onto the root of the SD card. The first push that has a version's notes and
+   no release for it yet creates the tag `v<version>` and the release, with the zip and the notes
+   (`tools/publish_release.sh`). Later pushes keep each release's zip as it is and bring its text in line with
+   its notes file, so a release's text is fixed by committing its notes. Releases from before the zip (0.0.1 had
+   only `Compendium.nro`) were repacked as a zip from their own `.nro`.
+
+Each run also keeps the switch folder as an artifact named **Compendium**, for trying a build before it's released.
 
 If a build fails, the workflow pushes its log to a branch named `ci-logs-<job>`, so it can be read without
 opening the run.

@@ -28,13 +28,18 @@ consola, y desactivar los mods siempre deja el juego como estaba.
 
 ## Instalar
 
-<img src="images/install-steps.es.png" alt="Instalar en 4 pasos: descarga Compendium.nro, cópialo en switch/Compendium de la SD, ábrelo con R + cualquier juego, pulsa A en un mod y abre Persona 5 Royal" width="100%">
+<img src="images/install-steps.es.png" alt="Instalar en 4 pasos: descarga el zip, copia su carpeta switch a la SD, abre Compendium con R + cualquier juego, pulsa A en un mod y abre Persona 5 Royal" width="100%">
 
-1. En la página de [Releases](../../../releases), en **Assets**, descarga **`Compendium.nro`**. ("Source code" es
-   solo para desarrolladores.)
-2. Cópialo en la tarjeta SD, en `switch/Compendium/Compendium.nro`. Crea la carpeta `Compendium` si no está.
-   (Funciona en cualquier lugar dentro de `switch/`, pero así queda junto a sus datos.)
-3. Vuelve a poner la tarjeta SD y enciende la consola.
+1. En la página de [Releases](../../../releases), en **Assets**, descarga **`Compendium-<versión>.zip`**.
+   ("Source code" es solo para desarrolladores.)
+2. Descomprímelo. Dentro hay una carpeta `switch` con todo en su lugar: `switch/Compendium/Compendium.nro`, una
+   guía corta (`README.txt`), las licencias y la carpeta `inbox` vacía.
+3. Copia esa carpeta **`switch`** en la raíz de tu tarjeta SD. Se une a la carpeta `switch` que ya está, junto a
+   tu otro homebrew.
+   - **En un Mac**, Finder reemplaza la carpeta en vez de unirla, lo que borraría tu otro homebrew. Ahí, abre la
+     carpeta `switch` del zip y copia solo la carpeta **`Compendium`** dentro de la carpeta `switch` de tu SD.
+   - Copiar por USB con DBI (MTP) o por FTP funciona igual.
+4. Vuelve a poner la tarjeta SD y enciende la consola.
 
 ## Abrir la app
 
@@ -120,6 +125,8 @@ mod, mantén **L** al abrir el juego (es el interruptor propio de Atmosphère, a
 ```
 sd:/switch/Compendium/
 ├── Compendium.nro     la app
+├── README.txt         una guía corta (del zip)
+├── LICENSES.txt       la licencia de Compendium y los avisos de terceros (del zip)
 ├── library/p5r/<mod>/ una copia de cada mod instalado: files/, cpk/ y sd/
 ├── inbox/             archivos para instalar desde Add mods
 ├── original/p5r/      el PATCH1.CPK y la lista de archivos del juego
@@ -141,7 +148,8 @@ Los mods con trucos, parches de exefs o plugins de Skyline también los ponen en
 
 ## Actualizar
 
-Reemplaza `Compendium.nro` por el nuevo. Tu biblioteca, el orden de carga y los ajustes se conservan. Después de
+Copia la carpeta `switch` del zip nuevo sobre la anterior, como al instalar (o reemplaza solo `Compendium.nro`).
+Tu biblioteca, el orden de carga y los ajustes se conservan. Después de
 una actualización del **juego**, repite el [paso único](#los-archivos-del-propio-juego-paso-único-recomendado).
 
 ## Quitar Compendium
@@ -153,6 +161,7 @@ guardado aparte. Luego borra `switch/Compendium/`.
 
 | Mensaje o problema | Qué hacer |
 |---|---|
+| **"Install failed: filesystem error: cannot make canonical path"** | Un error de la 0.0.1 en la Switch: actualiza a la 0.0.2 o una más nueva. Los mods que ya descargó se instalan sin volver a descargarse. |
 | **Un mod no aparece en el juego** | Comprueba que esté activado en **My mods** y por encima de cualquier mod marcado con ⚠ que cambie los mismos archivos. Asegúrate de no mantener **L** al abrir el juego. Luego **Settings → Build the game's mod files again**. |
 | **El juego se cierra o se congela al abrir después de instalar un mod** | Desactiva uno a uno los últimos mods que agregaste para encontrarlo. Revisa su página: algunos mods son para otra versión del juego, o solo para la versión de PC. Mantén **L** al abrir el juego para comprobar que funciona sin mods. |
 | **Error de Atmosphère con Program ID 010041544D530000** | Atmosphère se quedó sin memoria al cargar los mods. Normalmente son los complementos en segundo plano (sysmodules), no el mod: desactívalos en **Settings → Background add-ons**, reinicia la consola y vuelve a intentarlo. La app lo avisa cuando encuentra el reporte del cierre. |

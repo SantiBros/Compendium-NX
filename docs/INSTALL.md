@@ -25,13 +25,18 @@ always brings the game back to normal.
 
 ## Install
 
-<img src="images/install-steps.png" alt="Install in 4 steps: download Compendium.nro, copy it to switch/Compendium on the SD card, open it with R + any game, press A on a mod and start Persona 5 Royal" width="100%">
+<img src="images/install-steps.png" alt="Install in 4 steps: download the zip, copy its switch folder to the SD card, open Compendium with R + any game, press A on a mod and start Persona 5 Royal" width="100%">
 
-1. On the [Releases](../../../releases) page, under **Assets**, download **`Compendium.nro`**. ("Source code" is
-   only for developers.)
-2. Copy it to the SD card, in `switch/Compendium/Compendium.nro`. Make the `Compendium` folder if it isn't there.
-   (Anywhere under `switch/` works, but this keeps it next to its data.)
-3. Put the SD card back and turn the console on.
+1. On the [Releases](../../../releases) page, under **Assets**, download **`Compendium-<version>.zip`**.
+   ("Source code" is only for developers.)
+2. Unzip it. Inside is a `switch` folder with everything in its place: `switch/Compendium/Compendium.nro`, a short
+   guide (`README.txt`), the licenses and the empty `inbox` folder.
+3. Copy that **`switch`** folder to the root of your SD card. It joins the `switch` folder already there, next to
+   your other homebrew.
+   - **On a Mac**, Finder replaces a folder instead of joining it, which would remove your other homebrew. There,
+     open the zip's `switch` folder and copy just the **`Compendium`** folder into your SD card's `switch` folder.
+   - Copying over USB with DBI (MTP) or over FTP works the same way.
+4. Put the SD card back and turn the console on.
 
 ## Starting the app
 
@@ -113,6 +118,8 @@ Every change builds the game's CPK again, so it always matches the list. To play
 ```
 sd:/switch/Compendium/
 ├── Compendium.nro     the app
+├── README.txt         a short guide (from the zip)
+├── LICENSES.txt       Compendium's license and the third-party notices (from the zip)
 ├── library/p5r/<mod>/ a copy of every installed mod: files/, cpk/ and sd/
 ├── inbox/             archives to install from Add mods
 ├── original/p5r/      the game's own PATCH1.CPK and file list
@@ -133,7 +140,8 @@ Mods with cheats, exefs patches or Skyline plugins also put those in `atmosphere
 
 ## Updating
 
-Replace `Compendium.nro` with the new one. Your library, load order and settings are kept. After a **game**
+Copy the new zip's `switch` folder over the old one, as when installing (or just replace `Compendium.nro`). Your
+library, load order and settings are kept. After a **game**
 update, do the [one-time step](#the-games-own-files-one-time-step-recommended) again.
 
 ## Removing Compendium
@@ -145,6 +153,7 @@ had set aside. Then delete `switch/Compendium/`.
 
 | Message or problem | What to do |
 |---|---|
+| **"Install failed: filesystem error: cannot make canonical path"** | A bug of 0.0.1 on the Switch: update to 0.0.2 or newer. Mods it already downloaded install without downloading again. |
 | **A mod doesn't show in the game** | Check it's on in **My mods** and above any mod marked ⚠ that changes the same files. Make sure you didn't hold **L** when starting the game. Then **Settings → Build the game's mod files again**. |
 | **The game crashes or freezes at start after installing a mod** | Turn off the mods you added last, one at a time, to find the one. Check its page: some mods are for another game version, or for the PC version only. Hold **L** while starting the game to check it works without mods. |
 | **Atmosphère error with Program ID 010041544D530000** | Atmosphère ran out of memory while loading mods. That's usually background add-ons (sysmodules), not the mod: turn them off in **Settings → Background add-ons**, restart the console and try again. The app shows this when it finds the crash report. |
