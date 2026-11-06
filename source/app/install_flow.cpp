@@ -581,10 +581,12 @@ void InstallFlow::finish(const ModDetails& d, const ModFile& file, std::shared_p
             run(replace);
             return;
         }
-        std::string names;
-        for (const auto& n : clashing) names += (names.empty() ? "" : ", ") + n;
+        std::string names;  // "A", "A and B", "A, B and C"
+        for (size_t i = 0; i < clashing.size(); ++i)
+            names += (i == 0 ? "" : i + 1 == clashing.size() ? " and " : ", ") + clashing[i];
         auto* dialog = new brls::Dialog("Before you install " + d.summary.name + ":\n\nIt changes files that " + names +
-                                        " also change. The mod higher in My mods wins; new installs go to the top.");
+                                        (clashing.size() == 1 ? " also changes." : " also change.") +
+                                        " The mod higher in My mods wins; new installs go to the top.");
         dialog->addButton("Install", [run, replace] { run(replace); });
         dialog->addButton("Cancel", [this, work] {
             mm::removeTree(work);
