@@ -1,0 +1,82 @@
+name: Bug report
+description: The app doesn't work, freezes or crashes, or the game crashes with mods on (English or Spanish)
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report! Please **never attach game files** (CPKs or anything taken from the game). Reports with game files are deleted.
+        Check the [troubleshooting table](https://github.com/SantiBros/Compendium-NX/blob/main/docs/INSTALL.md#troubleshooting) first ([en español](https://github.com/SantiBros/Compendium-NX/blob/main/docs/INSTALL.es.md#solución-de-problemas)).
+        For one mod that won't install or doesn't work in the game, the **Mod report** form is quicker.
+  - type: input
+    id: version
+    attributes:
+      label: Compendium version
+      description: Shown in the Homebrew Menu, in Settings and on the first line of log.txt.
+      placeholder: "0.0.1"
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Console, firmware and Atmosphère version
+      placeholder: "Switch OLED, firmware 20.5.0, Atmosphère 1.9.5, emuMMC"
+    validations:
+      required: true
+  - type: input
+    id: game
+    attributes:
+      label: Persona 5 Royal version
+      description: Shown at the top of Compendium's sidebar.
+      placeholder: "1.0.2"
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Load mods with (Settings)
+      options:
+        - PATCH1.CPK (no plugin, the default)
+        - p5rcbt
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Where did it go wrong?
+      options:
+        - In Compendium (browsing, downloading, installing)
+        - In Compendium (My mods, Settings)
+        - Starting Persona 5 Royal with mods on
+        - In Persona 5 Royal, while playing
+    validations:
+      required: true
+  - type: dropdown
+    id: launch
+    attributes:
+      label: Compendium was opened from
+      options:
+        - Homebrew Menu, R + a game (title takeover)
+        - Homebrew Menu from the Album
+        - A forwarder or another launcher
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead? Which mods were on (links help)? A photo of the screen helps.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Attach `switch/Compendium/log.txt` (and `log.old.txt` if it happened in an earlier session). For an Atmosphère error, also the newest file in `atmosphere/crash_reports/`.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I use my own copy of the game, and I didn't attach any game files.
+          required: true

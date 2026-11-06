@@ -1,0 +1,11 @@
+name: Idea or request
+description: Something Compendium could do better, or a game or mod format it could support
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: For a mod format, link a mod that uses it. Never attach game files.
+    validations:
+      required: true

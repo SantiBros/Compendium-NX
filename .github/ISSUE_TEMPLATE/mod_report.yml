@@ -1,0 +1,47 @@
+name: Mod report
+description: A mod that won't install, or installs but doesn't work in the game (English or Spanish)
+labels: ["mod format"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! Mods come in many shapes, and each report helps the app read more of them.
+        Please link the mod's page instead of attaching it, and **never attach game files**.
+  - type: input
+    id: link
+    attributes:
+      label: Link to the mod
+      description: Its GameBanana page (or wherever it's published), and which file you installed if there are several.
+      placeholder: "https://gamebanana.com/mods/123456 · Switch version (v1.2)"
+    validations:
+      required: true
+  - type: dropdown
+    id: what
+    attributes:
+      label: What happens?
+      options:
+        - Compendium can't install it ("Can't install this file")
+        - It installs, but the change doesn't show in the game
+        - It installs, but the game crashes or freezes
+        - It installs, but part of it is missing (the app noted something it left out)
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Compendium and game versions
+      placeholder: "Compendium 0.0.1, Persona 5 Royal 1.0.2"
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What does the app say when installing? Were other mods on? Does the mod work when it's the only one on?
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log
+      description: Attach `switch/Compendium/log.txt`. It lists what the app found in the archive.
+    validations:
+      required: true
