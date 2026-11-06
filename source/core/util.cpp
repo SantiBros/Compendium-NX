@@ -60,6 +60,14 @@ std::string slugify(std::string_view s, size_t maxLen) {
     return out.empty() ? "mod" : out;
 }
 
+std::string relativeTo(const fs::path& p, const fs::path& base) {
+    std::string s = p.generic_string(), b = base.generic_string();
+    while (b.size() > 1 && b.back() == '/') b.pop_back();
+    if (s.size() > b.size() && s.compare(0, b.size(), b) == 0 && (s[b.size()] == '/' || b.back() == '/'))
+        return s.substr(b.size() + (s[b.size()] == '/' ? 1 : 0));
+    return p.lexically_relative(base).generic_string();  // purely lexical too
+}
+
 std::vector<std::string> pathParts(const fs::path& p) {
     std::vector<std::string> parts;
     for (const auto& part : p) {

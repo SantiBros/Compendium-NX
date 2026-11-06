@@ -126,7 +126,7 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
         if (!it->is_regular_file()) continue;
         FileRec f;
         f.abs = it->path();
-        f.rel = fs::relative(it->path(), root).generic_string();
+        f.rel = relativeTo(it->path(), root);
         f.parts = pathParts(fs::path(f.rel));
         if (f.parts.empty()) continue;
         for (const auto& p : f.parts) f.lower.push_back(toLower(p));

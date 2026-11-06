@@ -87,3 +87,11 @@ TEST("log file: lines, and a new file once it's full") {
     log::info("not written once closed");
     CHECK(th::read(file).find("not written") == std::string::npos);
 }
+
+TEST("relative paths are worked out from the text, also for the Switch's sdmc: paths") {
+    CHECK(relativeTo("sdmc:/switch/Compendium/work/1/files/Title Screen/BASE/A.GMD", "sdmc:/switch/Compendium/work/1/files") ==
+          "Title Screen/BASE/A.GMD");
+    CHECK(relativeTo("sdmc:/w/files/a.pak", "sdmc:/w/files/") == "a.pak");
+    CHECK(relativeTo("/tmp/x/y/z.bin", "/tmp/x") == "y/z.bin");
+    CHECK(relativeTo("/tmp/xy/z.bin", "/tmp/x") == "../xy/z.bin");  // a name that only starts the same isn't inside
+}

@@ -19,6 +19,11 @@ bool endsWithI(std::string_view s, std::string_view suffix);
 // Reduce a name to something safe as a single FAT32 path component.
 std::string slugify(std::string_view s, size_t maxLen = 48);
 
+// `p` relative to `base` ("sdmc:/x/files/a/b.pak" from "sdmc:/x/files" -> "a/b.pak"), worked out from
+// the paths' text alone. fs::relative can't be used: it asks the filesystem for canonical paths,
+// which the Switch's SD card driver refuses ("cannot make canonical path: Invalid argument").
+std::string relativeTo(const fs::path& p, const fs::path& base);
+
 // Split a relative generic path into components ("a/b/c" -> {a,b,c}).
 std::vector<std::string> pathParts(const fs::path& p);
 
