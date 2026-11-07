@@ -92,6 +92,7 @@ folder that looks like a mod, what goes where:
 | `ModConfig.json` with `P5REssentials/CPK/<name>.CPK/…` | A **Reloaded-II PC mod**: the files under the CPK folders are used; `.dll` code and FEmulator folders are left out with a note. |
 | `p5r/bind/…` | A **p5rcbt folder**: packed into the CPK. |
 | Folders named like the game's (`BASE`, `EN`, `PATCH1`, `SOUND`, `MOVIE`…), `romfs/CPK/PATCH1/`, `PATCH1.CPK_unpacked` | **Loose files**: packed at those paths. |
+| A `PATCH1` folder holding `BASE/`, `EN/`… (or `PATCH1/`), often with `cpkmakec.exe` and a `.bat` | **A PATCH1.CPK to pack**: the paths start below that folder (`PATCH1/EN/MOVIE/MOV000.USM` is `EN/MOVIE/MOV000.USM`); the PC tool is skipped. |
 
 A file outside any known folder (`BTL_UI.PAK` on its own) is looked up in the game's file list, read during the
 one-time step: if the game has a file with that name, the mod's goes to the same path (`PATCH1/` first, then `EN/`,
@@ -127,6 +128,14 @@ again updates the mod in place, keeping its spot in the list.
 2. **The CPK** is built from the game's own PATCH1 files (when they were read) and every mod that's on. A hash of
    what went in (each file's mod, path and size) is stored with it, so nothing is rebuilt when nothing changed.
    With no mod on, the built CPK is deleted and whatever was there before is put back.
+
+**Where the game looks.** Inside its CPKs, the game looks a file up in `PATCH1/` first, then in the language's
+folder (`EN/`…), then in `BASE/`: `PATCH1/MOVIE/MOV000.USM` (Royal's opening, from the update) hides
+`EN/MOVIE/MOV000.USM`. So when the mod that wins a path brings it in `EN/` or `BASE/` and nothing as high brings it
+in `PATCH1/`, the `PATCH1/` copies below it (the game's, or lower mods') are left out of the archive, which is what
+happens when such a mod is packed on its own on a PC. In p5rcbt mode, where the game's `PATCH1.CPK` stays, the
+mod's file is also put in `PATCH1/`. When these rules change, a number stored with the build makes the app build
+again once when it opens.
 
 Conflicts are worked out from the same lists: every CPK path or SD path that more than one enabled mod brings, with
 the mods in priority order. The interface shows them in My mods and before installing.

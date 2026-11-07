@@ -35,12 +35,19 @@ itself. No PC, no CriPakTools, no copying folders by hand.
 > many mods made for the PC version ([which ones](#which-mods-work)), but it doesn't mod the PC game.
 
 > [!NOTE]
-> **Tested on a Switch.** 0.0.1 opened and browsed GameBanana's mods on a Switch Lite, but installing a mod, simple
-> or big, stopped with "cannot make canonical path". 0.0.2 fixes that. It's still a test version: back up your
-> saves, use emuMMC, and [tell us](#help-wanted-testers) how installing mods and playing with them goes.
+> **Tested on a Switch.** Compendium browses GameBanana and installs mods on a Switch Lite. Testing there found two
+> bugs, now fixed: installs failed in 0.0.1, and mods packed to be built with CriWare's tool on a PC, like the one
+> that brings back Persona 5's opening, didn't show in 0.0.2. It's still a test version: back up your saves, use
+> emuMMC, and [tell us](#help-wanted-testers) how your mods work in the game.
 
 > [!TIP]
-> **New in 0.0.2: mods install on the Switch.** The error that stopped every install in 0.0.1 is fixed, and mods
+> **New in 0.0.3: mods made to be packed on a PC work.** Some mods come as a `PATCH1` folder with CriWare's
+> `cpkmakec` tool, to build a `PATCH1.CPK` on a PC; the one that brings back Persona 5's opening is one of them.
+> Compendium put their files one folder too deep, so the game never found them, and the game's own copy of the
+> opening still played over the mod's. Both are fixed, and mods installed with 0.0.2 are fixed by themselves the
+> first time 0.0.3 opens.
+>
+> **0.0.2: mods install on the Switch.** The error that stopped every install in 0.0.1 is fixed, and mods
 > 0.0.1 already downloaded install without downloading again. The release is now a zip with the `switch` folder
 > ready to copy onto the SD card, with a short guide in English and Spanish. And a new icon.
 >
@@ -230,14 +237,14 @@ Choose in **Settings → Load mods with**:
 ## Status
 
 > [!NOTE]
-> **Testing.** The app opens and browses GameBanana on a Switch. 0.0.2 fixes installing mods there, and the next
-> reports will say how installing and playing with mods goes. The app's core (the CPK builder, the mod formats, the
+> **Testing.** The app browses GameBanana and installs mods on a Switch; the next reports will say how mods work in
+> the game. The app's core (the CPK builder, the mod formats, the
 > load order) is checked by automated tests on every change. Back up your saves and use emuMMC.
 
 | Part | State |
 |---|---|
 | Opening the app, browsing and searching GameBanana | ✅ Works on a Switch |
-| Downloading and installing mods | 🧪 Failed on a Switch in 0.0.1 ("cannot make canonical path"); fixed in 0.0.2, waiting for reports |
+| Downloading and installing mods | ✅ Works on a Switch since 0.0.2 |
 | Building PATCH1.CPK (default mode) | 🧪 Checked by tests; waiting for reports of mods showing in the game |
 | Aemulus packages, CPKs, Atmosphère / SimpleModManager / p5rcbt folders, loose files | 🧪 Checked by tests; waiting for reports |
 | PC mods (Reloaded-II) | 🧪 Game files adapted; ❌ `.dll` code mods can't run on the Switch |
@@ -247,7 +254,8 @@ Choose in **Settings → Load mods with**:
 | Persona 4 Golden, Persona 3 Portable, Persona 5 Strikers, Persona 5 Tactica, Persona 4 Arena Ultimax | 🔜 Planned for later versions |
 
 **Known issues**
-- 0.0.1 can't install mods on a Switch: use 0.0.2.
+- 0.0.1 can't install mods on a Switch, and 0.0.2 doesn't apply mods made to be packed with `cpkmakec` (like
+  Persona 5's opening): use 0.0.3.
 
 See the [changelog](CHANGELOG.md) for what changed in each version.
 

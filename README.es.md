@@ -36,13 +36,20 @@ Sin PC, sin CriPakTools, sin copiar carpetas a mano.
 > muchos mods hechos para la versión de PC ([cuáles](#qué-mods-funcionan)), pero no modifica el juego de PC.
 
 > [!NOTE]
-> **Probada en una Switch.** La 0.0.1 abrió y exploró los mods de GameBanana en una Switch Lite, pero instalar un
-> mod, simple o grande, se detenía con "cannot make canonical path". La 0.0.2 lo arregla. Sigue siendo una versión
-> de prueba: haz copia de tus partidas, usa emuMMC y [cuéntanos](#se-buscan-testers) cómo te va al instalar mods y
-> jugar con ellos.
+> **Probada en una Switch.** Compendium explora GameBanana e instala mods en una Switch Lite. Las pruebas ahí
+> encontraron dos errores, ya arreglados: en la 0.0.1 fallaban las instalaciones, y en la 0.0.2 no se aplicaban los
+> mods hechos para armarse con la herramienta de CriWare en un PC, como el que trae la intro de Persona 5. Sigue
+> siendo una versión de prueba: haz copia de tus partidas, usa emuMMC y [cuéntanos](#se-buscan-testers) cómo
+> funcionan tus mods en el juego.
 
 > [!TIP]
-> **Novedades de la 0.0.2: los mods se instalan en la Switch.** El error que detenía cada instalación en la 0.0.1
+> **Novedades de la 0.0.3: funcionan los mods hechos para armarse en un PC.** Algunos mods vienen como una carpeta
+> `PATCH1` con la herramienta `cpkmakec` de CriWare, para armar un `PATCH1.CPK` en un PC; el que trae la intro de
+> Persona 5 es uno de ellos. Compendium ponía sus archivos una carpeta más adentro, así que el juego nunca los
+> encontraba, y además la intro propia del juego seguía tapando la del mod. Las dos cosas están arregladas, y los
+> mods instalados con la 0.0.2 se corrigen solos la primera vez que abres la 0.0.3.
+>
+> **0.0.2: los mods se instalan en la Switch.** El error que detenía cada instalación en la 0.0.1
 > está arreglado, y los mods que la 0.0.1 ya descargó se instalan sin volver a descargarse. La versión viene ahora
 > en un zip con la carpeta `switch` lista para copiar en la SD, con una guía corta en español e inglés. Y un icono
 > nuevo.
@@ -242,15 +249,15 @@ Elige en **Settings → Load mods with**:
 ## Estado
 
 > [!NOTE]
-> **En pruebas.** La app abre y explora GameBanana en una Switch. La 0.0.2 arregla la instalación de mods ahí, y los
-> próximos reportes dirán cómo va instalar mods y jugar con ellos. El núcleo de la app (el armado del CPK, los
+> **En pruebas.** La app explora GameBanana e instala mods en una Switch; los próximos reportes dirán cómo funcionan
+> los mods en el juego. El núcleo de la app (el armado del CPK, los
 > formatos de mods, el orden de carga) se comprueba con pruebas automáticas en cada cambio. Haz copia de tus
 > partidas y usa emuMMC.
 
 | Parte | Estado |
 |---|---|
 | Abrir la app, explorar y buscar en GameBanana | ✅ Funciona en una Switch |
-| Descargar e instalar mods | 🧪 Fallaba en una Switch en la 0.0.1 ("cannot make canonical path"); arreglado en la 0.0.2, esperando reportes |
+| Descargar e instalar mods | ✅ Funciona en una Switch desde la 0.0.2 |
 | Armado de PATCH1.CPK (modo predeterminado) | 🧪 Comprobado con pruebas; esperando reportes de mods que aparezcan en el juego |
 | Paquetes de Aemulus, CPKs, carpetas de Atmosphère / SimpleModManager / p5rcbt, archivos sueltos | 🧪 Comprobado con pruebas; esperando reportes |
 | Mods de PC (Reloaded-II) | 🧪 Se adaptan los archivos del juego; ❌ los mods de código `.dll` no pueden funcionar en la Switch |
@@ -260,7 +267,8 @@ Elige en **Settings → Load mods with**:
 | Persona 4 Golden, Persona 3 Portable, Persona 5 Strikers, Persona 5 Tactica, Persona 4 Arena Ultimax | 🔜 Previstos para versiones futuras |
 
 **Problemas conocidos**
-- La 0.0.1 no puede instalar mods en una Switch: usa la 0.0.2.
+- La 0.0.1 no puede instalar mods en una Switch, y la 0.0.2 no aplica los mods hechos para armarse con `cpkmakec`
+  (como la intro de Persona 5): usa la 0.0.3.
 
 Mira el [registro de cambios](CHANGELOG.md) para saber qué cambió en cada versión.
 

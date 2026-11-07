@@ -3,6 +3,26 @@
 All notable changes to Compendium. Versions 0.0.x are test versions: 0.1.0 will be the first one that works
 without problems on a Switch.
 
+## [0.0.3]
+
+**Mods made to be packed on a PC work.** Some mods come as a `PATCH1` folder plus CriWare's `cpkmakec` tool, for
+building a `PATCH1.CPK` on a PC; the one that brings back Persona 5's opening is one of them. In 0.0.2 they
+installed but never showed in the game.
+
+### Fixed
+- **Files of a `PATCH1` folder that holds `EN/`, `BASE/`… go where the game looks for them.** The app kept the
+  `PATCH1` folder in their paths (`PATCH1/EN/MOVIE/MOV000.USM` instead of `EN/MOVIE/MOV000.USM`), so the game never
+  found them. Mods installed with 0.0.2 are fixed by themselves the first time 0.0.3 opens.
+- **A mod's file is no longer hidden by the game's own copy in `PATCH1/`.** The game looks a file up in `PATCH1/`
+  first, then in the language's folder, then in `BASE/`. When a mod brings a file in `EN/` or `BASE/` (Persona 5's
+  opening is `EN/MOVIE/MOV000.USM`) and the game's update has it in `PATCH1/` (Royal's opening), the game's copy is
+  left out of the archive, as it is when such a mod is packed on a PC. With p5rcbt, the mod's file is also put in
+  `PATCH1/`. A mod higher in the list that brings its own `PATCH1/` copy still wins.
+
+### Changed
+- CriWare's packing tool that some mods ship (`cpkmakec.exe`, its DLLs and `.bat`) is recognized and skipped,
+  instead of being reported as unknown files.
+
 ## [0.0.2]
 
 **Mods install on the Switch.** In 0.0.1 the app opened and browsed GameBanana on a Switch, but every install, of a
