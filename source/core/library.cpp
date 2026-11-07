@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <ctime>
+#include <functional>
+#include <map>
 #include <set>
 
 #include "cpk.hpp"
@@ -101,6 +103,87 @@ void moveFile(const fs::path& from, const fs::path& to) {
     fs::remove(from, ec);
 }
 
+// The game looks a file up in the PATCH1 folder of its CPKs first, then in the language's folder, then in
+// BASE, so PATCH1/MOVIE/MOV000.USM hides EN/MOVIE/MOV000.USM. "patch1/movie/mov000.usm" -> {"patch1",
+// "movie/mov000.usm"}; "" as the folder for paths outside those folders.
+std::pair<std::string, std::string> splitLayer(const std::string& path) {
+    static const std::set<std::string> kFolders = {"patch1", "base", "en", "fr", "it", "de", "es"};
+    std::string l = toLower(path);
+    std::replace(l.begin(), l.end(), '\\', '/');
+    auto slash = l.find('/');
+    if (slash == std::string::npos || !kFolders.count(l.substr(0, slash))) return {"", l};
+    return {l.substr(0, slash), l.substr(slash + 1)};
+}
+
+// A source of the archive and who brings it: -1 the game's own PATCH1.CPK, then the enabled mods from the lowest.
+struct OwnedSource {
+    cpk::Source source;
+    int owner;
+    std::string folder, rest;  // splitLayer(source.path)
+};
+
+// When a mod brings a file in EN/ or BASE/ (say EN/MOVIE/MOV000.USM) and nothing above it brings it in PATCH1/,
+// the PATCH1/ copies below it (from the game's PATCH1.CPK, or lower mods) would still hide it in the game. Mods
+// made to replace the whole PATCH1.CPK rely on those being gone, like the one that brings back Persona 5's
+// opening. So those PATCH1/ copies are left out; and where the game's own PATCH1.CPK stays in place (p5rcbt),
+// the mod's file is also put in PATCH1/. `names` gives each owner's name, for the log.
+std::vector<cpk::Source> resolveLayers(std::vector<OwnedSource> all, const std::set<std::string>& gamePatchFiles,
+                                       bool gamePatchStays, const std::function<std::string(int)>& names) {
+    struct Winner {
+        int owner = -2;
+        bool hasPatch = false;
+        const OwnedSource* lower = nullptr;  // its file in EN/, BASE/…: EN first
+    };
+    std::map<std::string, Winner> win;
+    for (const auto& s : all) {
+        if (s.folder.empty()) continue;
+        auto& w = win[s.rest];
+        if (s.owner > w.owner) w = {s.owner, false, nullptr};
+        if (s.owner != w.owner) continue;
+        if (s.folder == "patch1")
+            w.hasPatch = true;
+        else if (!w.lower || (s.folder == "en" && w.lower->folder != "en"))
+            w.lower = &s;
+    }
+    std::vector<cpk::Source> out;
+    std::vector<cpk::Source> promoted;
+    for (const auto& s : all) {
+        if (s.folder == "patch1") {
+            const auto& w = win[s.rest];
+            if (s.owner < w.owner && !w.hasPatch) {
+                log::info("left out " + s.source.path + " from " + names(s.owner) + ": " + names(w.owner) +
+                          " brings " + w.lower->source.path + ", which it would hide");
+                continue;
+            }
+        }
+        out.push_back(s.source);
+    }
+    if (gamePatchStays)
+        for (const auto& [rest, w] : win)
+            if (w.owner >= 0 && !w.hasPatch && w.lower && gamePatchFiles.count(rest)) {
+                cpk::Source s = w.lower->source;
+                s.path = "PATCH1/" + s.path.substr(s.path.find('/') + 1);
+                log::info("also put " + w.lower->source.path + " from " + names(w.owner) + " in " + s.path +
+                          ", so the game's own copy there doesn't hide it");
+                promoted.push_back(std::move(s));
+            }
+    out.insert(out.end(), promoted.begin(), promoted.end());
+    return out;
+}
+
+// Changes when the way archives are built changes, so they're built again once.
+// 2: PATCH1/ copies that would hide a mod's EN/ or BASE/ file are left out (0.0.3).
+constexpr int kBuildRules = 2;
+
+// 0.0.2 filed the files of a mod's "PATCH1" folder that held EN/, BASE/… under PATCH1/EN/…; they belong in EN/….
+std::string fixPackFolderPath(const std::string& cpkPath) {
+    static const std::set<std::string> kFolders = {"patch1", "base", "en", "fr", "it", "de", "es"};
+    auto parts = pathParts(fs::path(cpkPath));
+    if (parts.size() >= 3 && toLower(parts[0]) == "patch1" && kFolders.count(toLower(parts[1])))
+        return cpkPath.substr(cpkPath.find('/') + 1);
+    return cpkPath;
+}
+
 }  // namespace
 
 const char* deployModeKey(DeployMode m) { return m == DeployMode::P5rcbt ? "p5rcbt" : "patch1"; }
@@ -112,6 +195,12 @@ NotEnoughSpaceError::NotEnoughSpaceError(uint64_t n, uint64_t f)
       free(f) {}
 
 Library::Library(fs::path sdRoot, fs::path dataDir) : sdRoot_(std::move(sdRoot)), dataDir_(std::move(dataDir)) {}
+
+bool Library::outdatedBuild() const {
+    for (const auto& [game, gs] : games_)
+        if (!gs.output.empty() && gs.rules < kBuildRules) return true;
+    return false;
+}
 
 bool Library::load() {
     mods_.clear();
@@ -137,9 +226,35 @@ bool Library::load() {
         return false;
     }
     const json modList = j.value("mods", json::array());
+    fixedPaths_ = 0;
     for (const auto& m : modList) {
         auto rec = fromJson(m);
-        if (!rec.id.empty()) mods_.push_back(std::move(rec));
+        if (rec.id.empty()) continue;
+        std::set<std::string> seen;
+        std::vector<std::string> fixed;
+        for (const auto& p : rec.cpkFiles) {
+            auto q = fixPackFolderPath(p);
+            if (q != p) {
+                auto dir = modDir(rec) / "files";
+                auto from = dir / storedPath(p), to = dir / storedPath(q);
+                std::error_code fe;
+                if (fs::exists(from, fe)) {
+                    fs::create_directories(to.parent_path(), fe);
+                    fs::remove(to, fe);
+                    fs::rename(from, to, fe);
+                }
+                if (fe) {
+                    log::warn("couldn't move " + p + " of " + rec.name + " to " + q + ": " + fe.message());
+                    q = p;
+                } else {
+                    log::info(rec.name + ": " + p + " is now " + q);
+                    ++fixedPaths_;
+                }
+            }
+            if (seen.insert(cpk::pathKey(q)).second) fixed.push_back(q);
+        }
+        rec.cpkFiles = std::move(fixed);
+        mods_.push_back(std::move(rec));
     }
     const json games = j.value("games", json::object());
     const json deployed = j.value("deployed", json::object());
@@ -152,6 +267,7 @@ bool Library::load() {
         gs.output = get<std::string>(g, "output", "");
         gs.outputKey = get<std::string>(g, "outputKey", "");
         gs.outputSize = get<uint64_t>(g, "outputSize", 0);
+        gs.rules = get<int>(g, "rules", 0);
         gs.status.target = gs.output;
         gs.status.files = get<size_t>(g, "outputFiles", 0);
         gs.status.bytes = gs.outputSize;
@@ -173,7 +289,7 @@ void Library::save() const {
     for (const auto& [g, gs] : games_)
         games[std::string(gameInfo(g).key)] = {
             {"mode", deployModeKey(gs.mode)}, {"output", gs.output}, {"outputKey", gs.outputKey},
-            {"outputSize", gs.outputSize}, {"outputFiles", gs.status.files},
+            {"outputSize", gs.outputSize}, {"rules", gs.rules}, {"outputFiles", gs.status.files},
             {"withOriginals", gs.status.withOriginals}, {"missingOriginals", gs.status.missingOriginals},
         };
     json j = {{"version", 1}, {"mods", mods}, {"games", games}, {"deployed", deployed_}, {"backups", backedUp_}};
@@ -515,33 +631,42 @@ void Library::applyCpk(Game game, bool force, const ProgressFn& progress) {
     const auto target = outputTarget(game, gs.mode);
     if (!gs.output.empty() && toLower(gs.output) != toLower(target)) removeOutput(gs);
 
-    std::vector<cpk::Source> sources;
+    std::vector<OwnedSource> owned;
+    auto addSource = [&](cpk::Source s, int owner) {
+        auto [folder, rest] = splitLayer(s.path);
+        owned.push_back({std::move(s), owner, std::move(folder), std::move(rest)});
+    };
     std::string key = std::string(deployModeKey(gs.mode)) + "\n";
     std::error_code ec;
     bool any = false;
     BuildStatus status;
-    if (gs.mode == DeployMode::Patch1) {
-        if (hasOriginalPatch(game)) {
-            auto orig = originalPatchCpk(game);
-            for (const auto& e : cpk::read(orig).entries) sources.push_back({e.path(), {}, orig, e});
-            key += "original " + std::to_string(fs::file_size(orig, ec)) + "\n";
-            status.withOriginals = true;
-        } else {
-            status.missingOriginals = true;
+    std::set<std::string> gamePatchFiles;  // the game's PATCH1/ files, as splitLayer's rest
+    if (hasOriginalPatch(game)) {
+        auto orig = originalPatchCpk(game);
+        for (const auto& e : cpk::read(orig).entries) {
+            if (gs.mode == DeployMode::Patch1) addSource({e.path(), {}, orig, e}, -1);
+            if (auto [folder, rest] = splitLayer(e.path()); folder == "patch1") gamePatchFiles.insert(rest);
         }
+        key += "original " + std::to_string(fs::file_size(orig, ec)) + "\n";
+        if (gs.mode == DeployMode::Patch1) status.withOriginals = true;
+    } else if (gs.mode == DeployMode::Patch1) {
+        status.missingOriginals = true;
     }
-    for (const auto* m : enabledAscending(game)) {
+    auto enabled = enabledAscending(game);
+    for (size_t i = 0; i < enabled.size(); ++i) {
+        const auto* m = enabled[i];
+        const int owner = int(i);
         auto dir = modDir(*m);
         for (const auto& b : m->bundles) {
             auto path = dir / "cpk" / b;
-            for (const auto& e : cpk::read(path).entries) sources.push_back({e.path(), {}, path, e});
+            for (const auto& e : cpk::read(path).entries) addSource({e.path(), {}, path, e}, owner);
             key += m->id + " " + std::to_string(m->installedAt) + " cpk " + b + " " +
                    std::to_string(fs::file_size(path, ec)) + "\n";
             any = true;
         }
         for (const auto& p : m->cpkFiles) {
             auto file = dir / "files" / storedPath(p);
-            sources.push_back({p, file, {}, {}});
+            addSource({p, file, {}, {}}, owner);
             key += m->id + " " + std::to_string(m->installedAt) + " " + p + " " +
                    std::to_string(fs::file_size(file, ec)) + "\n";
             any = true;
@@ -551,9 +676,12 @@ void Library::applyCpk(Game game, bool force, const ProgressFn& progress) {
         removeOutput(gs);
         return;
     }
+    auto sources = resolveLayers(std::move(owned), gamePatchFiles, gs.mode != DeployMode::Patch1,
+                                 [&](int owner) { return owner < 0 ? std::string("the game's PATCH1.CPK")
+                                                                   : "\"" + enabled[size_t(owner)]->name + "\""; });
     auto keyHash = std::to_string(stableId(key));
     auto dst = sdRoot_ / fs::path(target);
-    if (!force && keyHash == gs.outputKey && gs.output == target && fs::exists(dst, ec) &&
+    if (!force && keyHash == gs.outputKey && gs.rules == kBuildRules && gs.output == target && fs::exists(dst, ec) &&
         fs::file_size(dst, ec) == gs.outputSize)
         return;
 
@@ -583,6 +711,7 @@ void Library::applyCpk(Game game, bool force, const ProgressFn& progress) {
     gs.output = target;
     gs.outputKey = keyHash;
     gs.outputSize = result.bytes;
+    gs.rules = kBuildRules;
     status.target = target;
     status.files = result.files;
     status.bytes = result.bytes;

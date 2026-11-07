@@ -122,6 +122,46 @@ TEST("library: p5rcbt mode builds into p5r/bind and leaves PATCH1.CPK alone") {
     CHECK(fs::exists(env.sd / kPatch));
 }
 
+TEST("library: a mod's EN/ or BASE/ file isn't hidden by a PATCH1/ copy below it") {
+    // The game reads PATCH1/MOVIE/MOV000.USM before EN/MOVIE/MOV000.USM.
+    Env env;
+    th::makeCpk(env.lib.originalPatchCpk(Game::P5R), {{"PATCH1/MOVIE/MOV000.USM", "royal"}, {"PATCH1/X.BIN", "x"}},
+                env.tmp.path / "s");
+    env.lib.add(env.rec("og"), env.files({{"EN/MOVIE/MOV000.USM", "og"}}), true);
+    CHECK_EQ(env.inCpk(kPatch, "EN/MOVIE/MOV000.USM"), std::string("og"));
+    CHECK_EQ(env.inCpk(kPatch, "PATCH1/MOVIE/MOV000.USM"), std::string("<missing>"));
+    CHECK_EQ(env.inCpk(kPatch, "PATCH1/X.BIN"), std::string("x"));  // the rest of the game's files stay
+
+    // A mod above it that brings its own PATCH1/ copy wins, as the load order says.
+    env.lib.add(env.rec("top"), env.files({{"PATCH1/MOVIE/MOV000.USM", "top"}}), true);
+    CHECK_EQ(env.inCpk(kPatch, "PATCH1/MOVIE/MOV000.USM"), std::string("top"));
+    env.lib.move("top", -1);  // now below "og": its PATCH1/ copy would hide og's file
+    CHECK_EQ(env.inCpk(kPatch, "PATCH1/MOVIE/MOV000.USM"), std::string("<missing>"));
+    CHECK_EQ(env.inCpk(kPatch, "EN/MOVIE/MOV000.USM"), std::string("og"));
+
+    // p5rcbt leaves the game's PATCH1.CPK in place, so the mod's file goes in PATCH1/ too.
+    env.lib.setMode(Game::P5R, DeployMode::P5rcbt);
+    auto bind = Library::outputTarget(Game::P5R, DeployMode::P5rcbt);
+    CHECK_EQ(env.inCpk(bind, "PATCH1/MOVIE/MOV000.USM"), std::string("og"));
+    CHECK_EQ(env.inCpk(bind, "EN/MOVIE/MOV000.USM"), std::string("og"));
+}
+
+TEST("library: files 0.0.2 filed under PATCH1/EN/… move to EN/… when the list is loaded") {
+    Env env;
+    env.lib.add(env.rec("og"), env.files({{"PATCH1/EN/MOVIE/MOV000.USM", "og"}, {"BASE/A.BIN", "a"}}), true);
+    Library again{env.sd, env.data};
+    CHECK(again.load());
+    CHECK_EQ(again.pathsFixedOnLoad(), size_t(1));
+    CHECK(!again.outdatedBuild());
+    again.apply();
+    CHECK_EQ(env.inCpk(kPatch, "EN/MOVIE/MOV000.USM"), std::string("og"));
+    CHECK_EQ(env.inCpk(kPatch, "PATCH1/EN/MOVIE/MOV000.USM"), std::string("<missing>"));
+    CHECK_EQ(env.inCpk(kPatch, "BASE/A.BIN"), std::string("a"));
+    Library third{env.sd, env.data};
+    CHECK(third.load());
+    CHECK_EQ(third.pathsFixedOnLoad(), size_t(0));  // saved
+}
+
 TEST("library: state survives a restart; updating a mod replaces its files") {
     Env env;
     env.lib.add(env.rec("a"), env.files({{"BASE/A.BIN", "v1"}}, {{"p5r/cfg/x.txt", "1"}}), true);

@@ -92,6 +92,11 @@ public:
     // Reads state.json. An unreadable file is kept as state.json.corrupt and the library
     // starts empty (returns false).
     bool load();
+    // After load(): files of mods installed by an older version that were filed under the wrong CPK path and
+    // were moved to the right one, and whether something built by an older version should be built again.
+    // Either way, apply() brings the SD card up to date.
+    size_t pathsFixedOnLoad() const { return fixedPaths_; }
+    bool outdatedBuild() const;
     void save() const;
 
     std::vector<const ModRecord*> mods(Game game) const;  // highest priority first
@@ -140,11 +145,13 @@ public:
     const fs::path& dataDir() const { return dataDir_; }
 
 private:
+    size_t fixedPaths_ = 0;
     struct GameState {
         DeployMode mode = DeployMode::Patch1;
         std::string output;     // SD-relative path of the archive we built ("" = none)
         std::string outputKey;  // what it was built from
         uint64_t outputSize = 0;
+        int rules = 0;          // the build rules it was made with (kBuildRules)
         BuildStatus status;
     };
     ModRecord* findMut(const std::string& id);

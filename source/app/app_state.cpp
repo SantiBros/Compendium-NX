@@ -127,6 +127,23 @@ void AppState::init() {
     runFileJob([this, staleWork](mm::Library& lib) {
         mm::removeTree(staleWork);  // leftovers from an install interrupted by a crash or power-off
         lib.load();
+        // Mods filed under the wrong CPK path by an older version, or an archive built by older rules:
+        // build again now, so the game sees the fix without the player doing anything.
+        if (lib.pathsFixedOnLoad() || lib.outdatedBuild()) {
+            {
+                std::lock_guard lock(statusMutex_);
+                backgroundTask_ = "updates the game's mod files";
+            }
+            mm::log::info("updating the built archive for this version (" + std::to_string(lib.pathsFixedOnLoad()) +
+                          " files moved to their right place)");
+            try {
+                lib.apply();
+            } catch (const std::exception& e) {
+                mm::log::error(std::string("updating the built archive: ") + e.what());
+            }
+            std::lock_guard lock(statusMutex_);
+            backgroundTask_.clear();
+        }
         {
             auto all = lib.mods(mm::Game::P5R);
             size_t on = 0;

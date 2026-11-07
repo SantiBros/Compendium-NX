@@ -15,6 +15,13 @@ namespace {
 // game looks a file up by its full path, so a mod's file must sit under the same one.
 const std::set<std::string> kCpkRoots = {"base", "patch1", "sound", "movie", "en", "fr", "it", "de", "es"};
 
+// The folders the game looks a file up in, highest first: PATCH1/, the language's, BASE/. A mod's folder named
+// PATCH1 with one of these inside is a PATCH1.CPK to pack ("PATCH1/EN/MOVIE/MOV000.USM" is EN/MOVIE/…).
+const std::set<std::string> kLayerFolders = {"patch1", "base", "en", "fr", "it", "de", "es"};
+
+// CriWare's packing tool for PCs, which some mods ship to build their PATCH1.CPK; the app doesn't need it.
+const std::set<std::string> kCpkToolFiles = {"cpkmakec.exe", "cpkmaker.dll", "cpkbinder.dll", "cpkmakec.exe.config"};
+
 // Folders found right under BASE/ (and the language folders). A mod laid out from one of
 // these is missing its CPK folder.
 const std::set<std::string> kGameFolders = {
@@ -295,7 +302,9 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
         for (size_t i = 0; i + 1 < L.size(); ++i) {
             bool unpackedCpk = L[i].rfind("patch1.cpk", 0) == 0 && L[i] != "patch1.cpk";
             bool aemulusOut = L[i] == "patch1" && i >= 1 && L[i - 1] == "cpk";
-            if (unpackedCpk || aemulusOut) {
+            // A PATCH1 folder holding BASE/, EN/… (or PATCH1/) is what goes in the archive, not part of the paths.
+            bool patchToPack = L[i] == "patch1" && i + 2 < L.size() && kLayerFolders.count(L[i + 1]);
+            if (unpackedCpk || aemulusOut || patchToPack) {
                 rootEnd = i + 1;
                 break;
             }
@@ -359,6 +368,18 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
         v.name = slash == std::string::npos ? name : name.substr(slash + 1);
         if (v.name.empty()) v.name = formatName(v.format);
     }
+    bool cpkTool = false;
+    for (auto& f : files)
+        if (!f.used && (kCpkToolFiles.count(f.lower.back()) ||
+                        (ext(f.lower.back()) == ".bat" && f.lower.back().find("cpk") != std::string::npos))) {
+            f.used = true;
+            cpkTool = true;
+        }
+    if (cpkTool)
+        for (auto& v : b.variants)
+            if (v.format == ModFormat::LooseFiles)
+                v.notes.push_back("The archive comes with CriWare's tool for building PATCH1.CPK on a PC; "
+                                  "it isn't needed, the app builds the CPK itself.");
     std::erase_if(b.variants, [](const PersonaVariant& v) { return v.empty(); });
     out.variants = std::move(b.variants);
     if (out.variants.size() == 1) out.variants[0].name.clear();

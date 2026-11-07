@@ -150,3 +150,29 @@ TEST("layout: nothing usable") {
     CHECK(!l.problem.empty());
     CHECK_EQ(l.warnings.size(), size_t(1));
 }
+
+TEST("layout: a PATCH1 folder to pack with cpkmakec (Persona 5's opening mod)") {
+    t::TempDir tmp;
+    th::write(tmp.path / "P5ogINTRO/PATCH1/EN/MOVIE/MOV000.USM", "og");
+    th::write(tmp.path / "P5ogINTRO/PATCH1/EN/MOVIE/MOV050.USM", "og2");
+    th::write(tmp.path / "P5ogINTRO/CPK.bat", "cpkmakec PATCH1 PATCH1.CPK -mode=FILENAME");
+    th::write(tmp.path / "P5ogINTRO/cpkmakec.exe", "x");
+    th::write(tmp.path / "P5ogINTRO/CpkMaker.dll", "x");
+    th::write(tmp.path / "P5ogINTRO/CpkBinder.dll", "x");
+    auto l = detectPersonaLayout(tmp.path, Game::P5R);
+    CHECK_EQ(l.variants.size(), size_t(1));
+    auto paths = cpkPaths(l.variants[0]);
+    CHECK_EQ(paths.size(), size_t(2));
+    CHECK_EQ(paths[0], std::string("EN/MOVIE/MOV000.USM"));
+    CHECK_EQ(paths[1], std::string("EN/MOVIE/MOV050.USM"));
+    CHECK(l.warnings.empty());  // the PC packing tool isn't reported as unknown files
+    CHECK_EQ(l.variants[0].notes.size(), size_t(1));
+
+    t::TempDir tmp2;  // a folder named PATCH1 with the game's PATCH1/ paths inside
+    th::write(tmp2.path / "Mod/PATCH1/PATCH1/MOVIE/MOV000.USM", "m");
+    th::write(tmp2.path / "Other/PATCH1/MOVIE/MOV000.USM", "m");
+    auto l2 = detectPersonaLayout(tmp2.path, Game::P5R);
+    CHECK_EQ(l2.variants.size(), size_t(2));
+    CHECK_EQ(cpkPaths(l2.variants[0])[0], std::string("PATCH1/MOVIE/MOV000.USM"));
+    CHECK_EQ(cpkPaths(l2.variants[1])[0], std::string("PATCH1/MOVIE/MOV000.USM"));
+}
