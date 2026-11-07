@@ -10,6 +10,8 @@ NFS Most Wanted 2012 and Spider-Man 2 ports' art.
 make_art.py post <fonts dir> <screenshots dir> <out.jpg> <en|es> <label> <shot.jpg=caption>...: a 1920x1080 picture
 for announcing a version (Reddit, Facebook, Discord), with three screenshots and their captions.
 make_art.py coming <fonts dir> <icon.png> <out.jpg> <en|es>: a 1920x1080 picture of what's planned.
+make_art.py update <fonts dir> <icon.png> <out.jpg> <label> <title> <heading=line>...: a 1920x1080 picture of an
+update's changes.
 
 The screenshots dir holds browse.jpg (docs/images/screenshots). The font is Barlow Condensed (SIL Open Font
 License 1.1), not included: the fonts dir holds BarlowCondensed-<weight>-<normal|italic>.ttf, e.g. from the
@@ -443,11 +445,46 @@ def coming(out, lang, icon_png):
     img.save(out, quality=92)
 
 
+def update_card(out, label, title, items, icon_png):
+    """1920x1080, for announcing an update: a label, the title and up to three changes as (heading, line)."""
+    W, H = 1920, 1080
+    img = Image.new("RGB", (W, H), BG)
+    glow = Image.new("RGB", (W, H), (26, 32, 52))
+    img.paste(glow, (0, 0), fade_mask(W, H, -W, int(W * 0.9), 1.0).transpose(Image.FLIP_LEFT_RIGHT))
+    shards(img, 1600, 470, 520, -6)
+    ic = Image.open(icon_png).convert("RGB").resize((430, 430), Image.LANCZOS)
+    mask = Image.new("L", ic.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, ic.width - 1, ic.height - 1], radius=56, fill=255)
+    img.paste(ic, (1600 - 215, 470 - 215), mask)
+    d = ImageDraw.Draw(img)
+    x0 = 100
+    spaced(d, (x0, 70), label.upper(), font(700, False, 40), RED, 8)
+    d.text((x0 - 6, 112), title.upper(), font=font(900, True, 168), fill=WHITE)
+    y = 340
+    hf, sf = font(800, True, 58), font(500, False, 36)
+    for heading, line in items:
+        d.rectangle([x0, y + 20, x0 + 40, y + 30], fill=RED)
+        d.text((x0 + 62, y), heading.upper(), font=hf, fill=WHITE)
+        yy = y + 74
+        for row in wrap_runs(d, [(line, 0)], {0: sf}, 1060):
+            d.text((x0 + 62, yy), "".join(t for t, _ in row), font=sf, fill=GRAY)
+            yy += 46
+        y = yy + 34
+    d.text((x0, H - 62), "github.com/SantiBros/Compendium-NX  ·  ko-fi.com/santibros", font=font(500, False, 32), fill=GRAY)
+    red_rule(img, H - 10, 0, W, 10, int(W * 0.55))
+    img.save(out, quality=92)
+
+
 if __name__ == "__main__":
     if len(sys.argv) >= 8 and sys.argv[1] == "post":
         # make_art.py post <fonts dir> <screenshots dir> <out.jpg> <en|es> <label> <shot.jpg=caption>...
         FONTS, shots, out, lang, label = sys.argv[2:7]
         post(shots, out, lang, label, [tuple(a.split("=", 1)) for a in sys.argv[7:]])
+        sys.exit(0)
+    if len(sys.argv) >= 9 and sys.argv[1] == "update":
+        # make_art.py update <fonts dir> <icon.png> <out.jpg> <label> <title> <heading=line>...
+        FONTS, icon_png, out, label, title = sys.argv[2:7]
+        update_card(out, label, title, [tuple(a.split("=", 1)) for a in sys.argv[7:]], icon_png)
         sys.exit(0)
     if len(sys.argv) == 6 and sys.argv[1] == "coming":
         # make_art.py coming <fonts dir> <icon.png> <out.jpg> <en|es>
