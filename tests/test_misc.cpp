@@ -44,6 +44,22 @@ TEST("game file list: finds a file's CPK folder") {
     CHECK_EQ(list.resolve("NOPE/X"), std::string());
 }
 
+TEST("game file list: paths it has as they are, and bare file names") {
+    t::TempDir tmp;
+    GameFileList::save(tmp.path / "files.txt",
+                       {"BASE/BATTLE/A.BIN", "EN/BATTLE/A.BIN", "BASE/SOUND/EVENT/V.ACB", "SOUND_E/SOUND/EVENT/V.ACB",
+                        "BASE/SOUND/BGM.ACB", "BASE/X/DUP.BIN", "BASE/Y/DUP.BIN"});
+    GameFileList list;
+    CHECK(list.load(tmp.path / "files.txt"));
+    CHECK_EQ(list.resolve("SOUND_E/SOUND/EVENT/V.ACB"), std::string("SOUND_E/SOUND/EVENT/V.ACB"));
+    CHECK_EQ(list.resolve("base/sound/event/v.acb"), std::string("BASE/SOUND/EVENT/V.ACB"));
+    CHECK_EQ(list.resolve("SOUND/EVENT/V.ACB"), std::string("SOUND_E/SOUND/EVENT/V.ACB"));  // English voices first
+    CHECK_EQ(list.resolve("bgm.acb"), std::string("BASE/SOUND/BGM.ACB"));
+    CHECK_EQ(list.resolve("A.BIN"), std::string("EN/BATTLE/A.BIN"));  // one folder, under EN/ and BASE/
+    CHECK_EQ(list.resolve("DUP.BIN"), std::string());                 // two folders: can't tell
+    CHECK_EQ(list.resolve("NOPE.BIN"), std::string());
+}
+
 TEST("SimpleModManager mods are found on the SD card") {
     t::TempDir tmp;
     th::write(tmp.path / "mods/Persona 5 Royal/HD UI/contents/01005CA01580E000/romfs/CPK/PATCH1.CPK", "x");

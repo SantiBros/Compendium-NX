@@ -175,12 +175,23 @@ std::vector<cpk::Source> resolveLayers(std::vector<OwnedSource> all, const std::
 // 2: PATCH1/ copies that would hide a mod's EN/ or BASE/ file are left out (0.0.3).
 constexpr int kBuildRules = 2;
 
-// 0.0.2 filed the files of a mod's "PATCH1" folder that held EN/, BASE/… under PATCH1/EN/…; they belong in EN/….
-std::string fixPackFolderPath(const std::string& cpkPath) {
+// Paths earlier versions filed wrongly. 0.0.2 filed the files of a mod's "PATCH1" folder that held EN/, BASE/…
+// under PATCH1/EN/…; they belong in EN/…. Up to 0.0.3, a package's "BASE.CPK" or "EN.CPK" folder (named after the PC
+// version's CPKs) and SOUND_E/ ended up inside BASE/: "BASE/BASE.CPK/MODEL/…" is BASE/MODEL/…, "BASE/SOUND_E/…" is
+// SOUND_E/….
+std::string fixStoredPath(const std::string& cpkPath) {
     static const std::set<std::string> kFolders = {"patch1", "base", "en", "fr", "it", "de", "es"};
     auto parts = pathParts(fs::path(cpkPath));
-    if (parts.size() >= 3 && toLower(parts[0]) == "patch1" && kFolders.count(toLower(parts[1])))
-        return cpkPath.substr(cpkPath.find('/') + 1);
+    if (parts.size() < 3) return cpkPath;
+    auto first = toLower(parts[0]), second = toLower(parts[1]);
+    auto afterFirst = cpkPath.substr(cpkPath.find('/') + 1);
+    if (first == "patch1" && kFolders.count(second)) return afterFirst;
+    if (first != "base") return cpkPath;
+    if (second == "sound_e") return afterFirst;
+    if (second.size() > 4 && second.compare(second.size() - 4, 4, ".cpk") == 0) {
+        auto stem = second.substr(0, second.size() - 4);
+        if (stem != "patch1" && kFolders.count(stem)) return toUpper(stem) + afterFirst.substr(afterFirst.find('/'));
+    }
     return cpkPath;
 }
 
@@ -233,7 +244,7 @@ bool Library::load() {
         std::set<std::string> seen;
         std::vector<std::string> fixed;
         for (const auto& p : rec.cpkFiles) {
-            auto q = fixPackFolderPath(p);
+            auto q = fixStoredPath(p);
             if (q != p) {
                 auto dir = modDir(rec) / "files";
                 auto from = dir / storedPath(p), to = dir / storedPath(q);

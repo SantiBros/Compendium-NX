@@ -146,17 +146,25 @@ TEST("library: a mod's EN/ or BASE/ file isn't hidden by a PATCH1/ copy below it
     CHECK_EQ(env.inCpk(bind, "EN/MOVIE/MOV000.USM"), std::string("og"));
 }
 
-TEST("library: files 0.0.2 filed under PATCH1/EN/… move to EN/… when the list is loaded") {
+TEST("library: files earlier versions filed in the wrong folder move when the list is loaded") {
     Env env;
     env.lib.add(env.rec("og"), env.files({{"PATCH1/EN/MOVIE/MOV000.USM", "og"}, {"BASE/A.BIN", "a"}}), true);
+    // Up to 0.0.3: a package's BASE.CPK folder and SOUND_E/ ended up inside BASE/.
+    env.lib.add(env.rec("pc"), env.files({{"BASE/BASE.CPK/MODEL/D.DDS", "d"}, {"BASE/EN.CPK/INIT/T.BMD", "t"},
+                                          {"BASE/SOUND_E/SOUND/EVENT/E.ACB", "e"}}),
+                true);
     Library again{env.sd, env.data};
     CHECK(again.load());
-    CHECK_EQ(again.pathsFixedOnLoad(), size_t(1));
+    CHECK_EQ(again.pathsFixedOnLoad(), size_t(4));
     CHECK(!again.outdatedBuild());
     again.apply();
     CHECK_EQ(env.inCpk(kPatch, "EN/MOVIE/MOV000.USM"), std::string("og"));
     CHECK_EQ(env.inCpk(kPatch, "PATCH1/EN/MOVIE/MOV000.USM"), std::string("<missing>"));
     CHECK_EQ(env.inCpk(kPatch, "BASE/A.BIN"), std::string("a"));
+    CHECK_EQ(env.inCpk(kPatch, "BASE/MODEL/D.DDS"), std::string("d"));
+    CHECK_EQ(env.inCpk(kPatch, "EN/INIT/T.BMD"), std::string("t"));
+    CHECK_EQ(env.inCpk(kPatch, "SOUND_E/SOUND/EVENT/E.ACB"), std::string("e"));
+    CHECK_EQ(env.inCpk(kPatch, "BASE/BASE.CPK/MODEL/D.DDS"), std::string("<missing>"));
     Library third{env.sd, env.data};
     CHECK(third.load());
     CHECK_EQ(third.pathsFixedOnLoad(), size_t(0));  // saved

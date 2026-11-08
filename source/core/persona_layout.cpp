@@ -1,6 +1,7 @@
 #include "persona_layout.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <map>
 #include <set>
 
@@ -12,8 +13,9 @@ namespace mm {
 namespace {
 
 // P5R (Switch) keeps everything in ALL_USEU.CPK and PATCH1.CPK under these top folders; the
-// game looks a file up by its full path, so a mod's file must sit under the same one.
-const std::set<std::string> kCpkRoots = {"base", "patch1", "sound", "movie", "en", "fr", "it", "de", "es"};
+// game looks a file up by its full path, so a mod's file must sit under the same one. SOUND_E has the English
+// voices (SOUND_E/SOUND/EVENT/…); the other sounds and the movies are in BASE/SOUND/, EN/MOVIE/….
+const std::set<std::string> kCpkRoots = {"base", "patch1", "en", "fr", "it", "de", "es", "sound_e"};
 
 // The folders the game looks a file up in, highest first: PATCH1/, the language's, BASE/. A mod's folder named
 // PATCH1 with one of these inside is a PATCH1.CPK to pack ("PATCH1/EN/MOVIE/MOV000.USM" is EN/MOVIE/…).
@@ -25,9 +27,14 @@ const std::set<std::string> kCpkToolFiles = {"cpkmakec.exe", "cpkmaker.dll", "cp
 // Folders found right under BASE/ (and the language folders). A mod laid out from one of
 // these is missing its CPK folder.
 const std::set<std::string> kGameFolders = {
-    "aicalc", "battle", "calendar", "camp", "dungeon", "event", "event_data", "facility", "field",
-    "font", "init", "minigame", "model", "script", "shop", "system", "title", "texture",
+    "aicalc", "battle",   "bustup",    "button", "calendar", "camp",   "cutin",  "dungeon", "event",
+    "event_data", "facility", "field", "font",   "image",    "init",   "minigame", "model", "movie",
+    "mypalace", "resource", "scheduler", "script", "shop",   "sound",  "system", "texture", "title",
+    "tutorial",
 };
+
+// Source files for pictures and models that some mods ship next to the game files; never part of the game.
+const std::set<std::string> kAuthoringExt = {".psd", ".pdn", ".xcf", ".kra", ".blend", ".blend1"};
 
 // Aemulus' build skips these (they're merged by its PC tools, or are package metadata).
 const std::set<std::string> kAemulusSkipExt = {
@@ -62,10 +69,34 @@ std::string ext(const std::string& name) {
 }
 
 bool isJunk(const FileRec& f) {
+    // __MACOSX, and hidden folders and files (.git/, .DS_Store, a ".derp" folder of PC tools).
     for (const auto& p : f.lower)
-        if (p == "__macosx" || p == ".git") return true;
+        if (p == "__macosx" || (!p.empty() && p[0] == '.')) return true;
     const auto& n = f.lower.back();
-    return n == ".ds_store" || n == "thumbs.db" || n == "desktop.ini" || (!n.empty() && n[0] == '.');
+    return n == "thumbs.db" || n == "desktop.ini" || kAuthoringExt.count(ext(n));
+}
+
+// DATA01/DATA.DAT…: a slot of the game's save data.
+bool isSaveSlot(const FileRec& f) {
+    if (f.lower.size() < 2 || f.lower.back() != "data.dat") return false;
+    const auto& d = f.lower[f.lower.size() - 2];
+    return d.size() == 6 && d.rfind("data", 0) == 0 && std::isdigit((unsigned char)d[4]) && std::isdigit((unsigned char)d[5]);
+}
+
+// "708BCACA873EA32B….ips": an exefs patch named by the build id of the game's program it changes.
+bool isBuildIdPatch(const std::string& lowerName) {
+    if (ext(lowerName) != ".ips") return false;
+    auto stem = lowerName.substr(0, lowerName.size() - 4);
+    return stem.size() >= 16 && stem.size() <= 64 &&
+           std::all_of(stem.begin(), stem.end(), [](char c) { return std::isxdigit((unsigned char)c); });
+}
+
+// A folder named after one of the PC version's CPKs ("BASE.CPK", "EN.CPK"), as some packages have: on the
+// Switch that's the folder of the same name in the game's CPKs. "base.cpk" -> "BASE"; "" for anything else.
+std::string pcCpkFolder(const std::string& lowerName) {
+    if (lowerName.size() <= 4 || lowerName.compare(lowerName.size() - 4, 4, ".cpk") != 0) return {};
+    auto stem = lowerName.substr(0, lowerName.size() - 4);
+    return stem != "patch1" && kCpkRoots.count(stem) ? toUpper(stem) : std::string();
 }
 
 bool isDoc(const FileRec& f) {
@@ -96,6 +127,7 @@ struct Builder {
 std::string placeInCpk(const std::string& path, const PathResolver& resolve, Builder& b, PersonaVariant& v) {
     auto slash = path.find('/');
     auto first = toLower(slash == std::string::npos ? path : path.substr(0, slash));
+    if (auto top = pcCpkFolder(first); !top.empty() && slash != std::string::npos) return top + path.substr(slash);
     if (kCpkRoots.count(first)) return path;
     if (resolve) {
         auto found = resolve(path);
@@ -152,6 +184,17 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
     std::set<std::string> skippedAemulus, skippedPc;
     bool pcCode = false;
 
+    // 0. Save data (DATA01/DATA.DAT…, with SYSTEM/SYSTEM.DAT): it goes in the game's save, not in its CPKs.
+    size_t saveFiles = 0;
+    bool hasSlots = std::any_of(files.begin(), files.end(), isSaveSlot);
+    for (auto& f : files) {
+        bool system = f.lower.size() >= 2 && f.lower.back() == "system.dat" && f.lower[f.lower.size() - 2] == "system";
+        if (isSaveSlot(f) || (hasSlots && system)) {
+            f.used = true;
+            ++saveFiles;
+        }
+    }
+
     // 1. Atmosphère layouts: [atmosphere/]contents/<title id>/… and exefs_patches/…
     for (auto& f : files) {
         const auto& L = f.lower;
@@ -186,6 +229,17 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
         }
     }
 
+    // 1b. An exefs patch without its folders ("<build id>.ips"): it goes in atmosphere/exefs_patches/<name>/.
+    std::set<size_t> exefsVariants;
+    for (auto& f : files) {
+        if (f.used || !isBuildIdPatch(f.lower.back())) continue;
+        auto folder = f.parts.size() > 1 ? f.parts[f.parts.size() - 2] : std::string("Compendium");
+        auto& v = b.variant("atmo", join(f.parts, 0, f.parts.size() - 1), ModFormat::Atmosphere);
+        v.sdFiles.push_back({f.abs, "atmosphere/exefs_patches/" + slugify(folder) + "/" + f.parts.back()});
+        exefsVariants.insert(b.indexOf(v));
+        f.used = true;
+    }
+
     // 2. p5rcbt: p5r/bind/<name>.cpk, p5r/bind/<folder>/…, p5r/cfg/cbt.toml
     for (auto& f : files) {
         if (f.used) continue;
@@ -210,6 +264,7 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
 
     // 3. Aemulus packages: the deepest folder with Package.xml / Mod.xml above each file.
     std::set<std::string> packages;
+    std::set<size_t> prebuild;  // packages with a Prebuild.bat
     for (const auto& f : files)
         if (f.lower.back() == "package.xml" || f.lower.back() == "mod.xml")
             packages.insert(toLower(join(f.parts, 0, f.parts.size() - 1)));
@@ -226,6 +281,7 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
         f.used = true;
         const auto& name = f.lower.back();
         auto e = ext(name);
+        if (name == "prebuild.bat") prebuild.insert(b.indexOf(v));
         bool inSkippedFolder = false;
         for (size_t i = depth; i + 1 < f.lower.size(); ++i)
             if (f.lower[i] == "tblpatches" || f.lower[i] == "binarypatches" || f.lower[i] == "spdpatches" ||
@@ -235,7 +291,7 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
             skippedAemulus.insert(inSkippedFolder ? "patch folders" : e);
             continue;
         }
-        if (kAemulusSkipExt.count(e) || name.rfind("preview", 0) == 0) continue;
+        if (kAemulusSkipExt.count(e) || isDoc(f)) continue;
         v.files.push_back({f.abs, placeInCpk(join(f.parts, depth, f.parts.size()), resolve, b, v)});
     }
 
@@ -311,13 +367,13 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
         }
         if (rootEnd == std::string::npos)
             for (size_t i = 0; i + 1 < L.size(); ++i)
-                if (kCpkRoots.count(L[i])) {
+                if (kCpkRoots.count(L[i]) || !pcCpkFolder(L[i]).empty()) {
                     rootEnd = i;
                     break;
                 }
         if (rootEnd == std::string::npos) continue;
         auto& v = b.variant("loose", join(f.parts, 0, rootEnd), ModFormat::LooseFiles);
-        v.files.push_back({f.abs, join(f.parts, rootEnd, f.parts.size())});
+        v.files.push_back({f.abs, placeInCpk(join(f.parts, rootEnd, f.parts.size()), resolve, b, v)});
         f.used = true;
     }
 
@@ -332,6 +388,26 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
             f.used = true;
             break;
         }
+    }
+
+    // 8. Any other file the game has under the same name, in one place: put there ("TWEWY/BGM.ACB" is
+    //    BASE/SOUND/BGM.ACB). Needs the game's file list.
+    std::map<size_t, size_t> byName;
+    bool emulatorPatch = false;
+    for (auto& f : files) {
+        if (f.used || isDoc(f)) continue;
+        if (ext(f.lower.back()) == ".pchtxt") {
+            emulatorPatch = true;
+            f.used = true;
+            continue;
+        }
+        if (!resolve) continue;
+        auto found = resolve(f.parts.back());
+        if (found.empty()) continue;
+        auto& v = b.variant("loose", join(f.parts, 0, f.parts.size() - 1), ModFormat::LooseFiles);
+        v.files.push_back({f.abs, found});
+        ++byName[b.indexOf(v)];
+        f.used = true;
     }
 
     // Count the files in each CPK that came with the mod (and drop unreadable ones).
@@ -354,6 +430,17 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
             v.notes.push_back(std::to_string(g->second) + (g->second == 1 ? " file wasn't" : " files weren't") +
                               " in a CPK folder (BASE, EN, PATCH1…), so " + (g->second == 1 ? "it was" : "they were") +
                               " put in BASE/, where most of the game's files are.");
+        if (auto n = byName.find(i); n != byName.end())
+            v.notes.push_back(std::to_string(n->second) + (n->second == 1 ? " file came" : " files came") +
+                              " without its folder; " + (n->second == 1 ? "it was" : "they were") +
+                              " put where the game has a file with the same name.");
+        if (exefsVariants.count(i))
+            v.notes.push_back("A patch for the game's program: Atmosphère applies it only to the game version it was made "
+                              "for.");
+        if (prebuild.count(i))
+            v.notes.push_back("This package runs a PC script (Prebuild.bat) to prepare some of its files before Aemulus "
+                              "builds it, which can't run on the Switch: part of the mod may not work. If the mod has "
+                              "another version, try that one.");
         if (v.format == ModFormat::Aemulus && !skippedAemulus.empty())
             v.notes.push_back("Parts that Aemulus merges on a PC (scripts, text, table and sprite patches) were left out; "
                               "the rest of the package is installed.");
@@ -394,10 +481,23 @@ PersonaLayout detectPersonaLayout(const fs::path& root, Game game, const PathRes
     if (unknown)
         out.warnings.push_back(std::to_string(unknown) + (unknown == 1 ? " file wasn't" : " files weren't") +
                                " recognized as part of the game and " + (unknown == 1 ? "is" : "are") + " left out (" +
-                               example + (unknown > 1 ? ", …)" : ")"));
+                               example + (unknown > 1 ? ", …)" : ")") +
+                               (resolve ? std::string()
+                                        : ". Once the app has read the game's own files, it can place more files."));
+    const char* kSaveHelp = "copy it with a save manager such as JKSV (and back up your own save first).";
+    const char* kEmulator = "made for emulators (Yuzu, Ryujinx): .pchtxt patches don't work on a Switch.";
+    if (saveFiles && !out.variants.empty())
+        out.warnings.push_back(std::string("The archive also has save data, which isn't installed: ") + kSaveHelp);
+    if (emulatorPatch && !out.variants.empty())
+        out.warnings.push_back(std::string("Part of this mod is ") + kEmulator);
 
     if (out.variants.empty()) {
-        if (pcCode)
+        if (saveFiles)
+            out.problem = std::string("This is a save file, not a mod: it goes in the game's save data. To use it, ") +
+                          kSaveHelp;
+        else if (emulatorPatch)
+            out.problem = std::string("This mod is ") + kEmulator;
+        else if (pcCode)
             out.problem = "This is a PC code mod (Reloaded-II): it changes the PC game's program, which can't run on the Switch.";
         else if (!skippedAemulus.empty())
             out.problem = "This Aemulus package only has parts that Aemulus merges on a PC (scripts, text or table "

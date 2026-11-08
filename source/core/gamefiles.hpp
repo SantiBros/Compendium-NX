@@ -21,12 +21,16 @@ public:
 
     bool empty() const { return byRest_.empty(); }
     size_t size() const { return count_; }
-    // "BATTLE/x.bin" -> "BASE/BATTLE/x.bin" (the folder the game reads it from), or "".
+    // "BATTLE/x.bin" -> "BASE/BATTLE/x.bin" (the folder the game reads it from), or "". A path the game has as it
+    // is ("SOUND_E/SOUND/…") comes back the same. A bare file name ("BGM.ACB") -> where the game has a file with
+    // that name, if that's in one place only.
     std::string resolve(const std::string& pathWithoutRoot) const;
 
 private:
     // lower-case path below its top folder -> the full paths that end with it
     std::unordered_map<std::string, std::vector<std::string>> byRest_;
+    // lower-case file name -> the full paths of the files with that name
+    std::unordered_map<std::string, std::vector<std::string>> byName_;
     size_t count_ = 0;
 };
 
