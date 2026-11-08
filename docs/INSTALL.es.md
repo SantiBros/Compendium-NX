@@ -169,6 +169,7 @@ guardado aparte. Luego borra `switch/Compendium/`.
 | **"Compendium ran out of memory"** | Se abrió desde el Álbum. Ciérrala con **+**, mantén **R** al abrir un juego y ábrela desde el Homebrew Menu que aparece. |
 | **"There isn't enough space on the SD card"** | La app lo revisa antes de escribir nada. Libera espacio, o quita los mods que no uses. |
 | **"Can't install this file"** | La app no encontró archivos del juego dentro (un mod de otro juego, o una herramienta en vez de un mod). El mensaje dice qué encontró. Si crees que es un mod de P5R, por favor [repórtalo](#reportar-un-error) con el enlace. |
+| **"This is a save file, not a mod"** | Las partidas guardadas (`DATA01/DATA.DAT`…) van en los datos de guardado del juego, no en sus archivos: cópialas con un gestor de partidas como [JKSV](https://github.com/J-D-K/JKSV), después de hacer copia de tu propia partida. |
 | **El modo p5rcbt no hace nada** | p5rcbt necesita la versión 1.0.2 del juego; comprueba que esté instalado (Settings) y activado en My mods. |
 | **El móvil no abre la dirección** | El móvil y la Switch deben estar en el mismo Wi-Fi, no en una red de invitados que aísla los dispositivos. La dirección solo funciona mientras esa pantalla está abierta. |
 | **Los archivos del propio juego dicen "Not read yet"** | Haz el [paso único](#los-archivos-del-propio-juego-paso-único-recomendado): mantén **L y R** al abrir el juego, sigue manteniendo hasta que aparezca el Homebrew Menu y abre Compendium. |

@@ -3,6 +3,39 @@
 All notable changes to Compendium. Versions 0.0.x are test versions: 0.1.0 will be the first one that works
 without problems on a Switch.
 
+## [0.0.4]
+
+**More mods end up where the game looks for them.** After 0.0.3, the file lists of every Persona 5 Royal (Switch)
+mod on GameBanana (82 mods, 126 files) went through the app's rules, to find the ones that would go to the wrong
+place, like the opening mod did. These are fixed.
+
+### Fixed
+- **Folders named after the PC version's CPKs** (`BASE.CPK/`, `EN.CPK/`), which some Aemulus packages have, ended
+  up inside `BASE/` (`BASE/BASE.CPK/MODEL/…`), where the game never looks. They're the game's `BASE/` and `EN/`
+  folders ("Persona 25th Anniversary Decals").
+- **English voices in `SOUND_E/`** went to `BASE/SOUND_E/…`. `SOUND_E` is one of the game's own folders ("Gay
+  Joker").
+- **Files in the game's `BUSTUP/`, `CUTIN/`, `BUTTON/`, `SCHEDULER/`… folders without their CPK folder** weren't
+  recognized and were left out ("Yoshizawa Hair Down"). `SOUND/` and `MOVIE/` without a CPK folder now go where the
+  game has them (`BASE/SOUND/…`), not at the top of the archive.
+- Mods installed with an earlier version whose files went to `BASE/BASE.CPK/` or `BASE/SOUND_E/` are fixed by
+  themselves the first time 0.0.4 opens. Mods whose files were left out need to be installed again.
+
+### Added
+- **Exefs patches** that come as a `<build id>.ips` file without their folders ("Max Handheld Resolution") are
+  installed in `atmosphere/exefs_patches/`.
+- **Files that come without any folder** (`BGM.ACB` on its own) go where the game has a file with the same name, if
+  it has it in one place only. This uses the game's own file list (the one-time L + R step).
+- **Save files** (`DATA01/DATA.DAT`…) are recognized: instead of being installed as a mod, the app says to copy them
+  with a save manager such as JKSV.
+- **Emulator patches** (`.pchtxt`): the app says they only work on emulators, instead of "no game files".
+- A note when an Aemulus package needs a PC script (`Prebuild.bat`) to prepare its files.
+
+### Changed
+- Hidden folders (`.git/`, a `.derp/` folder of PC tools) and source files for pictures and models (`.psd`…) are left
+  out of the archive.
+- When some files can't be placed, the warning says the app can place more once it has read the game's own files.
+
 ## [0.0.3]
 
 **Mods made to be packed on a PC work.** Some mods come as a `PATCH1` folder plus CriWare's `cpkmakec` tool, for

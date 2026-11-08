@@ -41,11 +41,14 @@ itself. No PC, no CriPakTools, no copying folders by hand.
 > emuMMC, and [tell us](#help-wanted-testers) how your mods work in the game.
 
 > [!TIP]
-> **New in 0.0.3: mods made to be packed on a PC work.** Some mods come as a `PATCH1` folder with CriWare's
-> `cpkmakec` tool, to build a `PATCH1.CPK` on a PC; the one that brings back Persona 5's opening is one of them.
-> Compendium put their files one folder too deep, so the game never found them, and the game's own copy of the
-> opening still played over the mod's. Both are fixed, and mods installed with 0.0.2 are fixed by themselves the
-> first time 0.0.3 opens.
+> **New in 0.0.4: more mods end up where the game looks for them.** Every Persona 5 Royal mod for Switch on
+> GameBanana went through the app's rules, and the ones that would go to the wrong place are fixed: folders named
+> after the PC version's CPKs (`BASE.CPK`), English voices in `SOUND_E`, and the game's `BUSTUP` and `CUTIN` folders.
+> Exefs patches (`.ips`) install in Atmosphère's folder, files that come without any folder go where the game has
+> one with the same name, and save files and emulator-only mods get a clear message instead of being installed.
+>
+> **0.0.3: mods made to be packed on a PC work**, like the one that brings back Persona 5's opening (a `PATCH1`
+> folder with CriWare's `cpkmakec`), and the game's own copy of a file no longer hides the mod's.
 >
 > **0.0.2: mods install on the Switch.** The error that stopped every install in 0.0.1 is fixed, and mods
 > 0.0.1 already downloaded install without downloading again. The release is now a zip with the `switch` folder
@@ -249,13 +252,15 @@ Choose in **Settings → Load mods with**:
 | Aemulus packages, CPKs, Atmosphère / SimpleModManager / p5rcbt folders, loose files | 🧪 Checked by tests; waiting for reports |
 | PC mods (Reloaded-II) | 🧪 Game files adapted; ❌ `.dll` code mods can't run on the Switch |
 | p5rcbt mode and its settings | 🧪 Game version 1.0.2 only |
-| Aemulus merging (`.flow`, `.msg`, `.tblpatch`, sprites, binary patches) | ❌ Not yet |
+| Aemulus merging (table patches `.tbp`/`.tblpatch`, files that go inside the game's `.PAK`/`.BIN` archives, `.flow`, `.msg`, sprites, binary patches) | ❌ Not yet: the rest of those mods installs |
 | A new interface | 🔜 Planned: the app's look will change in later versions |
 | Persona 4 Golden, Persona 3 Portable, Persona 5 Strikers, Persona 5 Tactica, Persona 4 Arena Ultimax | 🔜 Planned for later versions |
 
 **Known issues**
-- 0.0.1 can't install mods on a Switch, and 0.0.2 doesn't apply mods made to be packed with `cpkmakec` (like
-  Persona 5's opening): use 0.0.3.
+- 0.0.1 can't install mods on a Switch, 0.0.2 doesn't apply mods made to be packed with `cpkmakec` (like
+  Persona 5's opening), and 0.0.3 puts some packages' files in the wrong folder: use 0.0.4.
+- Changes that Aemulus merges on a PC don't show yet. In about ten of GameBanana's mods (new names, stats or item
+  descriptions), the models and textures install, but those changes don't.
 
 See the [changelog](CHANGELOG.md) for what changed in each version.
 

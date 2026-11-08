@@ -43,11 +43,15 @@ Sin PC, sin CriPakTools, sin copiar carpetas a mano.
 > funcionan tus mods en el juego.
 
 > [!TIP]
-> **Novedades de la 0.0.3: funcionan los mods hechos para armarse en un PC.** Algunos mods vienen como una carpeta
-> `PATCH1` con la herramienta `cpkmakec` de CriWare, para armar un `PATCH1.CPK` en un PC; el que trae la intro de
-> Persona 5 es uno de ellos. Compendium ponía sus archivos una carpeta más adentro, así que el juego nunca los
-> encontraba, y además la intro propia del juego seguía tapando la del mod. Las dos cosas están arregladas, y los
-> mods instalados con la 0.0.2 se corrigen solos la primera vez que abres la 0.0.3.
+> **Novedades de la 0.0.4: más mods quedan donde el juego los busca.** Todos los mods de Persona 5 Royal para
+> Switch de GameBanana pasaron por las reglas de la app, y se arreglaron los que irían a un lugar equivocado:
+> carpetas con el nombre de los CPK de la versión de PC (`BASE.CPK`), voces en inglés en `SOUND_E`, y las carpetas
+> `BUSTUP` y `CUTIN` del juego. Los parches de exefs (`.ips`) se instalan en la carpeta de Atmosphère, los archivos
+> que vienen sin carpeta van donde el juego tiene uno con el mismo nombre, y las partidas guardadas y los mods solo
+> para emuladores tienen un mensaje claro en vez de instalarse.
+>
+> **0.0.3: funcionan los mods hechos para armarse en un PC**, como el que trae la intro de Persona 5 (una carpeta
+> `PATCH1` con `cpkmakec` de CriWare), y la copia propia del juego de un archivo ya no tapa la del mod.
 >
 > **0.0.2: los mods se instalan en la Switch.** El error que detenía cada instalación en la 0.0.1
 > está arreglado, y los mods que la 0.0.1 ya descargó se instalan sin volver a descargarse. La versión viene ahora
@@ -262,13 +266,16 @@ Elige en **Settings → Load mods with**:
 | Paquetes de Aemulus, CPKs, carpetas de Atmosphère / SimpleModManager / p5rcbt, archivos sueltos | 🧪 Comprobado con pruebas; esperando reportes |
 | Mods de PC (Reloaded-II) | 🧪 Se adaptan los archivos del juego; ❌ los mods de código `.dll` no pueden funcionar en la Switch |
 | Modo p5rcbt y sus ajustes | 🧪 Solo la versión 1.0.2 del juego |
-| Combinación de Aemulus (`.flow`, `.msg`, `.tblpatch`, sprites, parches binarios) | ❌ Todavía no |
+| Combinación de Aemulus (parches de tablas `.tbp`/`.tblpatch`, archivos que van dentro de los `.PAK`/`.BIN` del juego, `.flow`, `.msg`, sprites, parches binarios) | ❌ Todavía no: el resto de esos mods se instala |
 | Una interfaz nueva | 🔜 Prevista: el diseño de la app va a cambiar en versiones futuras |
 | Persona 4 Golden, Persona 3 Portable, Persona 5 Strikers, Persona 5 Tactica, Persona 4 Arena Ultimax | 🔜 Previstos para versiones futuras |
 
 **Problemas conocidos**
-- La 0.0.1 no puede instalar mods en una Switch, y la 0.0.2 no aplica los mods hechos para armarse con `cpkmakec`
-  (como la intro de Persona 5): usa la 0.0.3.
+- La 0.0.1 no puede instalar mods en una Switch, la 0.0.2 no aplica los mods hechos para armarse con `cpkmakec`
+  (como la intro de Persona 5), y la 0.0.3 pone los archivos de algunos paquetes en la carpeta equivocada: usa la
+  0.0.4.
+- Los cambios que Aemulus combina en un PC todavía no aparecen. En unos diez mods de GameBanana (nombres,
+  estadísticas o descripciones de objetos nuevos), los modelos y texturas se instalan, pero esos cambios no.
 
 Mira el [registro de cambios](CHANGELOG.md) para saber qué cambió en cada versión.
 

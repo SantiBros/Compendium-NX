@@ -161,6 +161,7 @@ had set aside. Then delete `switch/Compendium/`.
 | **"Compendium ran out of memory"** | It was opened from the Album. Close it with **+**, hold **R** while starting a game and open it from the Homebrew Menu that appears. |
 | **"There isn't enough space on the SD card"** | The app checks before it writes anything. Free some space, or remove mods you don't use. |
 | **"Can't install this file"** | The app couldn't find game files in it (a mod for another game, or a tool rather than a mod). The message says what it found. If you think it's a P5R mod, please [report](#reporting-a-bug) it with the link. |
+| **"This is a save file, not a mod"** | Save files (`DATA01/DATA.DAT`…) go in the game's save data, not in its files: copy them with a save manager such as [JKSV](https://github.com/J-D-K/JKSV), after backing up your own save. |
 | **p5rcbt mode does nothing** | p5rcbt needs game version 1.0.2; check it's installed (Settings) and on in My mods. |
 | **The phone can't open the address** | Phone and Switch must be on the same Wi-Fi, not a guest network that isolates devices. The address works only while the screen is open. |
 | **The game's own files say "Not read yet"** | Do the [one-time step](#the-games-own-files-one-time-step-recommended): hold **L and R** while starting the game, keep holding until the Homebrew Menu opens, then open Compendium. |

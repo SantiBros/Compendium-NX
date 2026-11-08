@@ -89,17 +89,27 @@ folder that looks like a mod, what goes where:
 | `Package.xml` or `Mod.xml` | An **Aemulus package**: the files under it are at their CPK paths (`BASE/…`, `EN/…`, `PATCH1/…`). Each package in an archive is an option the player can pick. |
 | A `.cpk` | A **ready-made CPK**: its entries are used as they are (and merged with other mods). |
 | `atmosphere/contents/01005CA01580E000/…` | An **Atmosphère / SimpleModManager folder**: `romfs/CPK/*.CPK` and `romfs/CPK/PATCH1/…` go into the CPK; cheats, `exefs` patches and Skyline plugins are copied to the SD card. |
+| A `<build id>.ips` file on its own | An **exefs patch**: copied to `atmosphere/exefs_patches/<its folder>/`. |
 | `ModConfig.json` with `P5REssentials/CPK/<name>.CPK/…` | A **Reloaded-II PC mod**: the files under the CPK folders are used; `.dll` code and FEmulator folders are left out with a note. |
 | `p5r/bind/…` | A **p5rcbt folder**: packed into the CPK. |
-| Folders named like the game's (`BASE`, `EN`, `PATCH1`, `SOUND`, `MOVIE`…), `romfs/CPK/PATCH1/`, `PATCH1.CPK_unpacked` | **Loose files**: packed at those paths. |
+| The CPK folders (`BASE`, `EN`, `FR`…, `PATCH1`, `SOUND_E`), `romfs/CPK/PATCH1/`, `PATCH1.CPK_unpacked` | **Loose files**: packed at those paths. A folder named after one of the PC version's CPKs (`BASE.CPK`, `EN.CPK`) is the CPK folder of the same name. |
+| The game's folders without their CPK folder (`BATTLE`, `BUSTUP`, `MODEL`, `SOUND`…) | **Loose files**: put where the game has them (see below). |
 | A `PATCH1` folder holding `BASE/`, `EN/`… (or `PATCH1/`), often with `cpkmakec.exe` and a `.bat` | **A PATCH1.CPK to pack**: the paths start below that folder (`PATCH1/EN/MOVIE/MOV000.USM` is `EN/MOVIE/MOV000.USM`); the PC tool is skipped. |
 
-A file outside any known folder (`BTL_UI.PAK` on its own) is looked up in the game's file list, read during the
-one-time step: if the game has a file with that name, the mod's goes to the same path (`PATCH1/` first, then `EN/`,
-then `BASE/`…); otherwise it's placed under `BASE/` and the player is told.
+Paths without their CPK folder (`BATTLE/…`) are looked up in the game's file list, read during the one-time step:
+if the game has that path, the mod's file goes to the same place (`PATCH1/` first, then `EN/`, `SOUND_E/`,
+`BASE/`…); without the list it's placed under `BASE/` and the player is told. A file outside any known folder
+(`BGM.ACB` on its own) goes where the game has a file with that name, if the game has it in one folder only;
+otherwise it's left out with a warning.
 
-Parts that need a PC tool to merge (Aemulus' `.flow`, `.msg`, `.tblpatch`, sprite and binary patches) are left out
-with a note, so the rest of the mod still installs. An archive with no game files at all (a mod for another game,
+Save data (`DATA01/DATA.DAT`…, `SYSTEM/SYSTEM.DAT`) isn't installed: the app says to copy it with a save manager.
+Emulator patches (`.pchtxt`) aren't either. Hidden folders (`.git/`) and source files for pictures and models
+(`.psd`…) are left out.
+
+Parts that need a PC tool to merge (Aemulus' `.flow`, `.msg`, `.tblpatch`/`.tbp`, sprite and binary patches) are
+left out with a note, so the rest of the mod still installs. Files that Aemulus merges into one of the game's own
+`.PAK`/`.BIN`/`.PAC` archives (`EN/INIT/DATMSG/datItemHelp.bmd` goes inside `EN/INIT/DATMSG.PAK`) are packed at
+their paths, where the game doesn't read them yet. An archive with no game files at all (a mod for another game,
 a tool) is refused with what was found.
 
 On GameBanana, each mod usually has several files. `source/core/compat.cpp` reads the file names and descriptions
